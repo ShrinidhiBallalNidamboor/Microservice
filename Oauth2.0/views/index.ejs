@@ -90,6 +90,13 @@
       box-sizing: border-box;
     }
 
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
     button {
       width: 100%;
       padding: 10px;
@@ -130,7 +137,11 @@
     <form action="/register" method="POST">
       <input type="text" id="registerUsername" placeholder="Username" name= "Username" required>
       <input type="password" id="registerPassword" placeholder="Password" name="Password" required>
-      <input type="text" id="registerRole" placeholder="Role" name="Role" required>
+      <select name="Role" id="registerRole">
+        <option id="registerRole" name="Role" value="Manager">Manager</option>
+        <option id="registerRole" name="Role" value="TeamHead">Team Head</option>
+        <option id="registerRole" name="Role" value="TeamEmployee">Team Employee</option>
+      </select>
       <button type="submit">Register</button>
     </form>
   </div>
