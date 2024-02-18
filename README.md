@@ -1,5 +1,5 @@
 ## Accessing the oauth2.0 services
-### Include the following code in the server code for checking if the user is authenticated or not
+#### Include the following code in the server code for checking if the user is authenticated
 // Send the authorization code to localhost:4000/getToken to receive a token
 const response = await axios.post('http://localhost:4000/getToken', { code: authorizationCode });
 const jsonToken = response.data;
