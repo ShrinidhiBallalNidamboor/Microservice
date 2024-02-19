@@ -30,7 +30,8 @@ const teamassignmentSchema = new mongoose.Schema({
 // Define users
 const onlineusersSchema = new mongoose.Schema({
     ID: { type: String, unique: true },
-    name: { type: String, unique: true }
+    name: { type: String, unique: true },
+    teamID: String
 });
 
 // Define chat
@@ -72,7 +73,7 @@ io.on('connection', (socket) => {
                 });
                 res1 = await Teamassignment.find({'teamID': data.toUser});
                 for(let i=0;i<res1.length;i++){
-                    res2 = await Onlineuser.find({"name":res1[i].empID});
+                    res2 = await Onlineuser.find({"name":res1[i].empID, "teamID":data.toUser});
                     for(let j=0;j<res2.length;j++){
                         socket.to(res2[j].ID).emit('message',dataElement);
                     }
@@ -90,9 +91,10 @@ io.on('connection', (socket) => {
             else {
                 var onlineUser = { //forms JSON object for the user details
                     "ID":socket.id,
-                    "name":data.fromUser
+                    "name":data.fromUser,
+                    "teamID":data.toUser
                 };
-                Onlineuser.insertMany([onlineUser],(err,res) =>{
+                Onlineuser.findOneAndUpdate({"ID":socket.id}, onlineUser, {upsert: true}, function(err, doc) {
                     if(err){
                         console.log(onlineUser.name + " is already online...");
                     }
