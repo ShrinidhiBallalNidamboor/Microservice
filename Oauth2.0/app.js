@@ -11,8 +11,8 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-const PORT = 4000;
-var url_back = 'http://localhost:4000/'
+const PORT = 3000;
+var url_back = 'http://localhost:3000/'
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost/oauth2_example', {
@@ -22,12 +22,19 @@ mongoose.connect('mongodb://localhost/oauth2_example', {
 
 // Define User schema
 const userSchema = new mongoose.Schema({
-  username: String,
+  empID: String,
+  orgID: String,
   password: String,
   role: String
 });
 
+// Define organisation schema
+const organisationSchema = new mongoose.Schema({
+  name: String
+});
+
 const User = mongoose.model('User', userSchema);
+const Organisation = mongoose.model('User', organisationSchema);
 const secretKey = 'yourSecretKey';
 
 // Function to encrypt a variable
@@ -59,21 +66,17 @@ app.get("/:url", function(req, res){
 });
 
 // Authorization server endpoints
-
 // Registration endpoint
 app.post('/register', async (req, res) => {
-  const username = req.body.Username
+  const empID = req.body.empID
+  const name = req.body.organisationName
   const password = req.body.Password
-  const role = req.body.Role
-  // Check if the user already exists
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return res.status(400).json({ error: 'User already exists' });
-  }
+  const role = 'owner'
 
   // Create a new user
-  const newUser = new User({ username, password, role });
-  await newUser.save();
+  await Organisation.findOneAndUpdate({name: name}, {name: name}, {upsert: true});
+  const organisation = await Organisation.findOne({name: name});
+  await User.findOneAndUpdate({}, {empID: empID, orgID: organisation._id, password: password, role: role}, {upsert: true});
 
   console.log('User registered successfully');
   res.redirect("/");
@@ -81,18 +84,18 @@ app.post('/register', async (req, res) => {
 
 // Login endpoint
 app.post('/login', async (req, res) => {
-  const username = req.body.Username
+  const empID = req.body.empID
   const password = req.body.Password
 
   // Check if the user exists
-  const user = await User.findOne({ username, password });
+  const user = await User.findOne({ empID, password });
   if (!user) {
     console.log('Invalid credentials');
     res.redirect("/");
   }
 
   // Generate and return an access token
-  const accessToken = encrypt(jwt.sign({ username:username, role:user.role }, 'your-secret-key', { expiresIn: '1h' }));
+  const accessToken = encrypt(jwt.sign({ empID: empID, role:user.role }, 'your-secret-key', { expiresIn: '1h' }));
   
   try {
     const tokenObject = {
@@ -101,7 +104,7 @@ app.post('/login', async (req, res) => {
     // Convert the object to a JSON string
     const jsonTemporalToken = JSON.stringify(tokenObject);
     // Make a POST request to another server
-    if(url_back != 'http://localhost:4000/'){
+    if(url_back != 'http://localhost:3000/'){
       const response = await axios.post(url_back, jsonTemporalToken);
       // Process the response from the other server
       const responseData = response.data;

@@ -120,28 +120,24 @@
   <h1><b>Oauth 2.0<b></h1>
   <div class="tabs">
     <div class="tab active-tab" onclick="openTab('login')">Login</div>
-    <div class="tab" onclick="openTab('register')">Register</div>
+    <div class="tab" onclick="openTab('register')">New Organisation</div>
   </div>
 
   <div class="form active-form" id="loginForm">
     <h2>Login</h2>
     <form action="/login" method="POST">
-      <input type="text" id="loginUsername" placeholder="Username" name= "Username" required>
+      <input type="text" id="empID" placeholder="Employee ID" name="empID" required>
       <input type="password" id="loginPassword" placeholder="Password" name= "Password" required>
       <button type="submit">Login</button>
     </form>
   </div>
 
   <div class="form" id="registerForm">
-    <h2>Register</h2>
+    <h2>Create New Organisation</h2>
     <form action="/register" method="POST">
-      <input type="text" id="registerUsername" placeholder="Username" name= "Username" required>
+      <input type="text" id="empID" placeholder="Employee ID" name="empID" required>
+      <input type="text" id="organisationName" placeholder="Name of Organisation" name="organisationName" required>
       <input type="password" id="registerPassword" placeholder="Password" name="Password" required>
-      <select name="Role" id="registerRole">
-        <option id="registerRole" name="Role" value="Manager">Manager</option>
-        <option id="registerRole" name="Role" value="TeamHead">Team Head</option>
-        <option id="registerRole" name="Role" value="TeamEmployee">Team Employee</option>
-      </select>
       <button type="submit">Register</button>
     </form>
   </div>
