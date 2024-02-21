@@ -2,7 +2,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 const axios = require('axios');
 
 const app = express();
@@ -15,7 +14,7 @@ const PORT = 3000;
 var url_back = 'http://localhost:3000/'
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost/oauth2_example', {
+mongoose.connect('mongodb://localhost/oauth2', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -34,24 +33,8 @@ const organisationSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-const Organisation = mongoose.model('User', organisationSchema);
+const Organisation = mongoose.model('Organisation', organisationSchema);
 const secretKey = 'yourSecretKey';
-
-// Function to encrypt a variable
-function encrypt(text) {
-  const cipher = crypto.createCipher('aes-256-cbc', secretKey);
-  let encrypted = cipher.update(text, 'utf-8', 'hex');
-  encrypted += cipher.final('hex');
-  return encrypted;
-}
-
-// Function to decrypt an encrypted variable
-function decrypt(encryptedText) {
-  const decipher = crypto.createDecipher('aes-256-cbc', secretKey);
-  let decrypted = decipher.update(encryptedText, 'hex', 'utf-8');
-  decrypted += decipher.final('utf-8');
-  return decrypted;
-}
 
 // Enable parsing of JSON bodies
 app.use(bodyParser.json());
@@ -88,14 +71,14 @@ app.post('/login', async (req, res) => {
   const password = req.body.Password
 
   // Check if the user exists
-  const user = await User.findOne({ empID, password });
+  const user = await User.findOne({ empID: empID, password: password });
   if (!user) {
     console.log('Invalid credentials');
     res.redirect("/");
   }
 
   // Generate and return an access token
-  const accessToken = encrypt(jwt.sign({ empID: empID, role:user.role }, 'your-secret-key', { expiresIn: '1h' }));
+  const accessToken = jwt.sign({ empID: empID, role:user.role }, 'your-secret-key', { expiresIn: '1h' });
   
   try {
     const tokenObject = {
@@ -117,12 +100,6 @@ app.post('/login', async (req, res) => {
     console.error('Error:', error.message);
   }
   res.redirect("/");
-});
-
-app.post('/getToken', async (req, res) => {
-  const jsonTemporalToken = req.body
-  const jsonToken = decrypt(jsonTemporalToken)
-  res.json(jsonToken);
 });
 
 app.post('/verify', async (req, res) => {
