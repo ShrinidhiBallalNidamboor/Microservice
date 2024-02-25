@@ -1,0 +1,153 @@
+/* SprintPage.css */
+
+.sprint-page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.sprint-page-container h1 {
+    color: #555;
+    font-size: 54px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.sprint-details-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* sprintpage-css.css */
+
+.issue-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 25px;
+
+    /* Add negative margin to offset the positive margins on both ends */
+}
+
+.issue-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 8px;
+    width: calc(25% - 20px);
+    /* 4 cards in a row */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 0 5px;
+    /* Add margin to each card */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.issue-card:hover {
+    transform: scale(1.05);
+    /* Scale the card on hover */
+}
+
+/* Status-specific styles */
+.issue-card.in_progress {
+    background-color: #FFD700;
+    /* Yellow */
+}
+
+.issue-card.todo {
+    background-color: #FFA07A;
+    /* Light Salmon */
+}
+
+.issue-card.blocked {
+    background-color: rgb(188, 18, 18);
+    /* Tomato */
+}
+
+.issue-card.done {
+    background-color: #98FB98;
+    /* Pale Green */
+}
+
+.sprint-page-main h2 {
+    text-align: center;
+    margin: 40px;
+}
+
+
+/*button*/
+
+/* Add this CSS to your existing stylesheet or create a new one */
+
+/* Add this to your CSS file or style component */
+/* Add this to your CSS file or style component */
+.stats-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Adjust this based on your layout */
+}
+
+.stats-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px;
+    /* Add margin for spacing */
+}
+
+.stats-button:hover {
+    background-color: #45a049;
+    /* Darker green on hover */
+}
+
+/*graph*/
+
+/* Add this style to your existing CSS file or create a new one */
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.chart-row {
+    display: flex;
+    gap: 20px;
+}
+
+.chart-section {
+    flex: 1;
+    width: 100%;
+    max-width: 400px;
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.progress-container {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 40px
+}
+
+.chart-container canvas {
+    height: 100px;
+    border: 50px;
+    margin-bottom: 20px;
+}

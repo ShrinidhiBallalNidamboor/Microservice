@@ -1,10 +1,19 @@
-import React from "react";
-import Navbar from "./Navbar";
+// Home.js
+
+import React from 'react';
+import Navbar from './Navbar';
+import { Link } from 'react-router-dom'; // Import Link
+import SprintDashboard from './Sprint/SprintDashboard';
 
 const Home = () => {
     return (
-        <Navbar active="projects"></Navbar>
-    )
+        <div>
+            <Navbar active="projects" />
+            {/* Use Link to navigate to SprintDashboard */}
+            <Link to="/sprint-dashboard">Go to Sprint Dashboard</Link>
+            {/* ... other components or content ... */}
+        </div>
+    );
 }
 
 export default Home;
