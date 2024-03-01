@@ -1,0 +1,61 @@
+/* src/App.css */
+.text-left{
+    text-align: left;
+}
+
+.issue-status {
+    border: 1px solid #e0e0e0;
+    padding: 0;
+}
+
+
+.sprint-dashboard {
+    /* text-align: center; */
+}
+
+.sprint-details {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: calc(25% - 32px);
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    transition: transform 0.3s ease-in-out;
+    font-size: 16px;
+    /* Add transition for smooth effect */
+}
+
+.sprint-details h2 {
+    color: #555;
+    font-size: 36px;
+    margin-bottom: 8px;
+    text-align: center;
+    /* Center the heading */
+}
+
+.sprint-dashboard h1 {
+    color: #555;
+    font-size: 54px;
+    margin-bottom: 12px;
+    text-align: center;
+    /* Center the heading */
+}
+
+
+/* Add hover effect to scale the card */
+.sprint-details:hover {
+    transform: scale(1.05);
+    /* Scale the card on hover */
+}
+
+h1 {
+    color: #333;
+}
+
+h2 {
+    color: #555;
+}

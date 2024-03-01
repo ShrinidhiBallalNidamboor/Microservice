@@ -3,7 +3,7 @@
 import React from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom'; // Import Link
-import SprintDashboard from './Sprint/SprintDashboard';
+import SprintDashboard from './Analysis/SprintDashboard';
 
 const Home = () => {
     return (
