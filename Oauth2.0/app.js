@@ -3,15 +3,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const cors = require('cors');
 
 const app = express();
-app.use(express.static("public"));
-app.set('view engine', 'ejs');
+app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-const PORT = 3000;
-var url_back = 'http://localhost:3000/'
+const PORT = 8000;
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost/oauth2', {
@@ -39,15 +38,6 @@ const secretKey = 'yourSecretKey';
 // Enable parsing of JSON bodies
 app.use(bodyParser.json());
 
-app.get("/", function(req, res){
-    res.render("index");
-});
-
-app.get("/:url", function(req, res){
-  url_back = req.params.url;
-  res.redirect("/");
-});
-
 // Authorization server endpoints
 // Registration endpoint
 app.post('/register', async (req, res) => {
@@ -60,9 +50,8 @@ app.post('/register', async (req, res) => {
   await Organisation.findOneAndUpdate({name: name}, {name: name}, {upsert: true});
   const organisation = await Organisation.findOne({name: name});
   await User.findOneAndUpdate({}, {empID: empID, orgID: organisation._id, password: password, role: role}, {upsert: true});
-
   console.log('User registered successfully');
-  res.redirect("/");
+  res.status(201).send('User registered successfully');
 });
 
 // Login endpoint
@@ -74,32 +63,18 @@ app.post('/login', async (req, res) => {
   const user = await User.findOne({ empID: empID, password: password });
   if (!user) {
     console.log('Invalid credentials');
-    res.redirect("/");
   }
 
   // Generate and return an access token
-  const accessToken = jwt.sign({ empID: empID, role:user.role }, 'your-secret-key', { expiresIn: '1h' });
+  const accessToken = jwt.sign({ empID: empID, role:user.role, orgID: user.orgID }, 'your-secret-key', { expiresIn: '1h' });
   
   try {
-    const tokenObject = {
-      accessToken: accessToken
-    };
-    // Convert the object to a JSON string
-    const jsonTemporalToken = JSON.stringify(tokenObject);
     // Make a POST request to another server
-    if(url_back != 'http://localhost:3000/'){
-      const response = await axios.post(url_back, jsonTemporalToken);
-      // Process the response from the other server
-      const responseData = response.data;
-      res.status(200).json({ success: true, data: responseData });
-    }
-    else{
-      console.log('Invalid Operation')
-    }
+    res.status(200).json({ success: true, data: accessToken });
+
   } catch (error) {
     console.error('Error:', error.message);
   }
-  res.redirect("/");
 });
 
 app.post('/verify', async (req, res) => {
