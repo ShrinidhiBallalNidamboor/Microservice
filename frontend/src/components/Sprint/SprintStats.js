@@ -12,13 +12,13 @@ const Sprintstats = ({ barChartData, pieChartData, issues }) => {
                 if (!teamPoints.team) {
                     teamPoints.team = { done: 0, total: 0 };
                 }
-                teamPoints.team.done += issue.storyPoints;
+                teamPoints.team.done += issue.points;
             }
 
             if (!teamPoints.team) {
                 teamPoints.team = { done: 0, total: 0 };
             }
-            teamPoints.team.total += issue.storyPoints;
+            teamPoints.team.total += issue.points;
         });
 
         return (
@@ -34,16 +34,16 @@ const Sprintstats = ({ barChartData, pieChartData, issues }) => {
 
         issues.forEach((issue) => {
             if (issue.status === 'DONE') {
-                if (!memberPoints[issue.creator]) {
-                    memberPoints[issue.creator] = { done: 0, total: 0 };
+                if (!memberPoints[issue.ownerName]) {
+                    memberPoints[issue.ownerName] = { done: 0, total: 0 };
                 }
-                memberPoints[issue.creator].done += issue.storyPoints;
+                memberPoints[issue.ownerName].done += issue.points;
             }
 
-            if (!memberPoints[issue.creator]) {
-                memberPoints[issue.creator] = { done: 0, total: 0 };
+            if (!memberPoints[issue.ownerName]) {
+                memberPoints[issue.ownerName] = { done: 0, total: 0 };
             }
-            memberPoints[issue.creator].total += issue.storyPoints;
+            memberPoints[issue.ownerName].total += issue.points;
         });
 
         return (

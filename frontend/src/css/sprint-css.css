@@ -17,14 +17,21 @@
     box-sizing: border-box;
     transition: transform 0.3s ease-in-out;
     font-size: 16px;
-    /* Add transition for smooth effect */
+    height: 300px;
+    /* Set a fixed height for uniformity */
+    overflow: hidden;
+    /* Hide overflow content if it exceeds the fixed height */
 }
+
+/* Add media queries for responsiveness if needed */
+
 
 .sprint-details h2 {
     color: #555;
     font-size: 36px;
     margin-bottom: 8px;
     text-align: center;
+    height: 100px;
     /* Center the heading */
 }
 

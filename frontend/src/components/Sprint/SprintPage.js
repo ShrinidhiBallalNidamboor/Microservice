@@ -15,6 +15,8 @@ const SprintPage = () => {
     const { id } = useParams();
     const [showStats, setShowStats] = useState(false);
     // const [showMember, setShowMember] = useState(false);
+    const [issues, setIssues] = useState([]);
+    const [sprintDetails, setSprintDetails] = useState({});
     const [showLabel, setShowLabel] = useState("Show sprint statistics");
     // const [showLabel1, setShowLabel1] = useState("Show memberwise details");
     const [barChartData, setBarChartData] = useState({
@@ -38,31 +40,68 @@ const SprintPage = () => {
         ],
     });
 
-    // Sample sprint details
-    const sprintDetails = {
-        id: id,
-        name: `Sprint ${id}`,
-        startDate: '2024-02-01',
-        endDate: '2024-02-14',
+    // // Sample sprint details
+    // var sprintDetails = {
+    //     id: null,
+    //     status: null,
+    //     startDate: null,
+    //     endDate: null,
+    // };
+
+    const formatDateTime = (dateTimeString) => {
+
+        if (!dateTimeString) {
+            return "N/A"; // Or handle accordingly based on your requirements
+        }
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true
+        };
+
+        // Explicitly set the format to ISO 8601
+        const formattedDate = new Date(dateTimeString.replace(' ', 'T')).toLocaleString(undefined, options);
+
+        return formattedDate;
     };
 
+
+    useEffect(() => {
+        const fetchIssues = async () => {
+            try {
+                const response = await fetch(`http://localhost:8082/issues/sprintid/${id}`);
+                const data = await response.json();
+                setIssues(data);  // Assuming the response is an array of issues
+                setSprintDetails(data[0].sprint);
+            } catch (error) {
+                console.error('Error fetching issues:', error);
+            }
+        };
+
+        fetchIssues();
+    }, [id]);  // Fetch issues when the 'id' parameter changes
+
     // Dummy data for issues
-    const issues = [
-        { id: 1, name: 'Issue 1', creator: 'John Doe', status: 'TODO', storyPoints: 3 },
-        { id: 2, name: 'Issue 2', creator: 'Jane Smith', status: 'IN_PROGRESS', storyPoints: 5 },
-        { id: 3, name: 'Issue 3', creator: 'Bob Johnson', status: 'BLOCKED', storyPoints: 2 },
-        { id: 4, name: 'Issue 4', creator: 'Alice Brown', status: 'BLOCKED', storyPoints: 4 },
-        { id: 5, name: 'Issue 5', creator: 'Charlie Green', status: 'TODO', storyPoints: 1 },
-        { id: 6, name: 'Issue 6', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 3 },
-        { id: 7, name: 'Issue 7', creator: 'Eva Black', status: 'BLOCKED', storyPoints: 2 },
-        { id: 8, name: 'Issue 8', creator: 'Frank Gray', status: 'DONE', storyPoints: 8 },
-        { id: 9, name: 'Issue 9', creator: 'Frank Gray', status: 'BLOCKED', storyPoints: 5 },
-        { id: 10, name: 'Issue 10', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
-        { id: 11, name: 'Issue 11', creator: 'Frank Gray', status: 'IN_PROGRESS', storyPoints: 5 },
-        { id: 12, name: 'Issue 12', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 2 },
-        { id: 13, name: 'Issue 13', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
-        { id: 14, name: 'Issue 14', creator: 'Jane Smith', status: 'DONE', storyPoints: 1 },
-    ];
+    // const issues = [
+    //     { id: 1, name: 'Issue 1', creator: 'John Doe', status: 'TODO', storyPoints: 3 },
+    //     { id: 2, name: 'Issue 2', creator: 'Jane Smith', status: 'IN_PROGRESS', storyPoints: 5 },
+    //     { id: 3, name: 'Issue 3', creator: 'Bob Johnson', status: 'BLOCKED', storyPoints: 2 },
+    //     { id: 4, name: 'Issue 4', creator: 'Alice Brown', status: 'BLOCKED', storyPoints: 4 },
+    //     { id: 5, name: 'Issue 5', creator: 'Charlie Green', status: 'TODO', storyPoints: 1 },
+    //     { id: 6, name: 'Issue 6', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 3 },
+    //     { id: 7, name: 'Issue 7', creator: 'Eva Black', status: 'BLOCKED', storyPoints: 2 },
+    //     { id: 8, name: 'Issue 8', creator: 'Frank Gray', status: 'DONE', storyPoints: 8 },
+    //     { id: 9, name: 'Issue 9', creator: 'Frank Gray', status: 'BLOCKED', storyPoints: 5 },
+    //     { id: 10, name: 'Issue 10', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
+    //     { id: 11, name: 'Issue 11', creator: 'Frank Gray', status: 'IN_PROGRESS', storyPoints: 5 },
+    //     { id: 12, name: 'Issue 12', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 2 },
+    //     { id: 13, name: 'Issue 13', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
+    //     { id: 14, name: 'Issue 14', creator: 'Jane Smith', status: 'DONE', storyPoints: 1 },
+    // ];
 
 
     // useEffect(() => {
@@ -156,31 +195,32 @@ const SprintPage = () => {
                     {showLabel1}
                 </button> */}
             </div>
-            {!showStats && (
+            {!showStats && sprintDetails && issues && (
                 <div>
                     <div className="sprint-page-container">
                         <h1>{sprintDetails.name} Overview</h1>
                         <div className="sprint-details-box">
-                            <p>Start Date: {sprintDetails.startDate}</p>
-                            <p>End Date: {sprintDetails.endDate}</p>
+                            <p>Start Date: {formatDateTime(sprintDetails.startDate)}</p>
+                            <p>End Date: {formatDateTime(sprintDetails.endDate)}</p>
                             {/* Add more details as needed */}
-                            <p>Additional details and content for the sprint page.</p>
+                            <p>Duration: {sprintDetails.duration}</p>
+                            <p>Status: {sprintDetails.status}</p>
                         </div>
                     </div>
                     <h2>Issues in Sprint</h2>
                     <div className="issue-cards-container">
-                        {issues.map(issue => (
+                        {issues && issues.map(issue => (
                             <div key={issue.id} className={`issue-card ${issue.status.toLowerCase()}`}>
-                                <h3>{issue.name}</h3>
+                                <h3>{issue.description}</h3>
                                 <p>ID: {issue.id}</p>
-                                <p>Creator: {issue.creator}</p>
+                                <p>Creator: {issue.ownerName}</p>
                                 <p>Status: {issue.status}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             )}
-            {showStats && (
+            {showStats && sprintDetails && issues && (
                 <Sprintstats pieChartData={pieChartData} barChartData={barChartData} issues={issues} />
             )}
         </div>
