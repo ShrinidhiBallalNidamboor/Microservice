@@ -23,7 +23,8 @@ const Project = () => {
                 console.log(data);
                 setSprints(data);
             })
-    }, [])
+    }, [sprints]);
+
     const handleCreateSprint = () => {
         setShowModal(true);
     };
@@ -56,6 +57,16 @@ const Project = () => {
     const handleCloseModal = () => {
         setShowModal(false);
     };
+
+    const handleCompleteSprint = (id) => {
+        fetch(`http://localhost:4000/projects/${projectId}/sprints/${id}/complete`,
+            {
+                method: "PUT"
+            })
+            .then(res => {
+                setSprints(sprints);
+            }).catch(err => alert("Error adding sprint ", err));
+    }
 
     return (
         <div>
@@ -123,11 +134,20 @@ const Project = () => {
                                     return (
                                         <div className='sprint-details center'>
                                             <Link to={`/projects/${projectId}/sprints/${sprint.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                            <h4>Sprint {index + 1}</h4>
-                                            <div className='my-2'>Start Date: {sprint.start_date.split("T")[0]}</div>
-                                            <div>End Date: {sprint.end_date ? sprint.end_date.split("T")[0] : "-"}</div>
+                                                <h4>Sprint {index + 1}</h4>
+                                                <div className='my-2'>Start Date: {sprint.start_date.split("T")[0]}</div>
+                                                {
+                                                    sprint.end_date ?
+                                                        <div className='my-2'>End Date: {sprint.end_date.split("T")[0]}</div> : ""
+                                                }
+
+
                                             </Link>
-                                            
+                                            {
+                                                sprint.status == "Ongoing" ?
+                                                    <button className='mt-2 btn btn-success' onClick={(e) => {e.stopPropagation(); handleCompleteSprint(sprint.id)}}>Complete</button> : ""
+                                            }
+
 
                                         </div>
                                     )

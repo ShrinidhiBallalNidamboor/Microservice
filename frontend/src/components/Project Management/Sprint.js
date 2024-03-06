@@ -11,11 +11,11 @@ const Sprint = () => {
     const [issues, setIssues] = useState([]);
     const { projectId, sprintId } = useParams();
 
-    const [showModal, setShowModal] = useState(false);
-    const [description, setDescription] = useState('');
-    const [points, setPoints] = useState(0);
+    const [selectedIssue, setSelectedIssue] = useState(null);
+    const [notification, setNotification] = useState(null);    
 
     useEffect(() => {
+        
         fetch("http://localhost:4000/projects/" + projectId + "/sprints/" + sprintId + "/issues")
             .then(res => res.json())
             .then(data => {
@@ -24,10 +24,54 @@ const Sprint = () => {
             })
     }, [])
 
+    const handleIssueClick = (issue) => {
+        console.log("Selected ", issue);
+        setSelectedIssue(issue);
+    }
+
+    const handleEdit = () => {
+        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues`, {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                issue: {
+                    id: selectedIssue.id,
+                    description: selectedIssue.description,
+                    status: selectedIssue.status,
+                    points: selectedIssue.points
+                },
+            })
+        }).then(res => {
+            updateIssue(selectedIssue);
+            
+            handleCloseModal();
+            setNotification({ type: 'success', message: 'Issue updated successfully' });
+            setTimeout(() => {
+                setNotification(null);
+              }, 3000);
+        }).catch(err => {
+            alert("Error while updating issue");
+            console.log(err);
+            handleCloseModal();
+            setNotification({ type: 'error', message: 'Failed to update issue' });
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+        })
+    };
+
+    const handleCloseModal = () => {
+        setSelectedIssue(null);
+        console.log("set null");
+    };
+
     const showIssue = (issue) => {
         return (
-            <Link style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="p-3 bg-light my-1 mx-1">
+            <Link key={issue.id} onClick={() => handleIssueClick(issue)} style={{ textDecoration: 'none', color: 'inherit'}}>
+                <div className="p-3 bg-light my-1 mx-1 issue">
                     <h5 className="issue-desc">{issue.description}</h5>
                     <div className="issue-creator">{issue.owner_name}</div>
                 </div>
@@ -35,23 +79,27 @@ const Sprint = () => {
         )
     }
 
-    const handleCreateIssue = () => setShowModal(true);
+    const updateIssue = (updatedIssue) => {
+        console.log("Updating ", updatedIssue);
+        setIssues(issues.map(issue => issue.id === updatedIssue.id ? updatedIssue : issue));
+        console.log(issues);
+    }
 
     return (
         <div>
             <Navbar active="projects"></Navbar>
             <div className="row">
                 <div className="col-2">
-                    <ProjectSidebar active="team" projectId={projectId}></ProjectSidebar>
+                    <ProjectSidebar active="sprints" projectId={projectId}></ProjectSidebar>
                 </div>
                 <div className="col p-4">
                     <h3>Sprint dashboard</h3>
                     <Link to={`/projects/${projectId}/sprints/${sprintId}/issues/new`}>
-                        <button className="btn btn-primary my-3" onClick={handleCreateIssue}>
+                        <button className="btn btn-primary my-3">
                             Create Issue
                         </button>
                     </Link>
-                    
+
                     <div className="dashboard row center mx-1">
                         <div className="col todo issue-status">
                             <h4 className="bg-dark text-white p-2">Todo</h4>
@@ -79,6 +127,67 @@ const Sprint = () => {
                         </div>
 
                     </div>
+                    {selectedIssue && (
+                        <div className="modal" tabIndex="-1" role="dialog" style={{ display: 'block'}}>
+                            <div className="modal-dialog" role="document">
+                                <div className="modal-content" >
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Edit Issue</h5>
+                                        {/* <button type="button" className="close" onClick={handleCloseModal}>
+                                        <span>&times;</span>
+                                    </button> */}
+                                    </div>
+                                    <div className="modal-body text-left">
+
+                                        <div className="form-group mb-3">
+                                            <label htmlFor="description" className='mb-2'>Description</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="description"
+                                                value={selectedIssue.description}
+                                                required
+                                                onChange={(e) => setSelectedIssue((state) => {return ({...state, description: e.target.value})})}
+                                            />
+                                        </div>
+                                        <div className="form-group mb-3">
+                                            <label htmlFor="status" className='mb-2'>Status</label>
+                                            <select
+                                                
+                                                className="form-control"
+                                                id="status"onChange={(e) => setSelectedIssue((state) => {return ({...state, status: e.target.value})})}
+                                            >
+                                                <option value="TODO" selected={selectedIssue.status == "TODO"}>Todo</option>
+                                                <option value="IN_PROGRESS" selected={selectedIssue.status == "IN_PROGRESS"}>In Progress</option>
+                                                <option value="BLOCKED" selected={selectedIssue.status == "BLOCKED"}>Blocked</option>
+                                                <option value="DONE" selected={selectedIssue.status == "DONE"}>Done</option>
+
+                                            </select>
+                                        </div>
+                                        <div className="form-group mb-3">
+                                            <label htmlFor="points" className='mb-2'>Points</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="points"
+                                                value={selectedIssue.points}
+                                                required
+                                                onChange={(e) => setSelectedIssue((state) => {return ({...state, points: e.target.value})})}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
+                                            Close
+                                        </button>
+                                        <button type="button" className="btn btn-primary" onClick={handleEdit}>
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {issues.length == 0 ?
                         <h5 className="center mt-5">
                             No issues have been added to this sprint
@@ -86,6 +195,12 @@ const Sprint = () => {
                         : ""}
                 </div>
             </div>
+            
+            {notification && (
+                <div className={`notification text-white ${notification.type == 'success' ? "bg-success": "bg-dander"}`}>
+                {notification.message}
+                </div>
+            )}
         </div>
     )
 }

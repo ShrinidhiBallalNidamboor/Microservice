@@ -207,15 +207,15 @@ app.post('/projects/:project_id/sprints', (req, res) => {
 // Complete a sprint
 app.put('/projects/:project_id/sprints/:sprint_id/complete', (req, res) => {
 
-    const sprintId = req.params.sprint_id;
+    const sprintId = parseInt(req.params.sprint_id);
 
-    connection.query('UPDATE sprints SET status = "Completed", end_date = CURDATE() where id = ?', [sprintId], (err, results) => {
+    connection.query('UPDATE sprints SET status = "Completed", end_date = CURDATE() where id = ?;', [sprintId], (err, results) => {
         if (err) {
             console.error('Error completing new sprint', err);
-            res.status(500).send('Error creating new sprint');
+            res.status(500).send('Error completing new sprint');
             return;
         }
-        res.status(201).send("Sprint completed successfully");
+        res.status(200).send("Sprint completed successfully");
     });
 });
 
