@@ -12,7 +12,8 @@ DROP TABLE IF EXISTS projects;
 
 CREATE TABLE projects(
     id INT PRIMARY KEY AUTO_INCREMENT,
-    description VARCHAR(100) NOT NULL
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(250) NOT NULL
 );
 
 CREATE TABLE organization_projects (
@@ -50,9 +51,9 @@ CREATE TABLE issues (
     FOREIGN KEY (sprint_id) REFERENCES sprints(id)
 );
 
-INSERT INTO projects (description) VALUES ("Project 1");
-INSERT INTO projects (description) VALUES ("Project 2");
-INSERT INTO projects (description) VALUES ("Project 3");
+INSERT INTO projects (name, description) VALUES ("Project 1", "Description 1");
+INSERT INTO projects (name, description) VALUES ("Project 2", "Description 2");
+INSERT INTO projects (name, description) VALUES ("Project 3", "Description 3");
 
 INSERT INTO organization_projects (organization_id, project_id) VALUES ("1", 1);
 INSERT INTO organization_projects (organization_id, project_id) VALUES ("1", 2);

@@ -32,6 +32,7 @@ const Projects = () => {
                         <tr>
                             <th scope="col">Project ID</th>
                             <th scope="col">Project Name</th>
+                            <th scope="col">Project Description</th>
                             <th scope="col" className="text-end">Action</th>
                         </tr>
                     </thead>
@@ -39,12 +40,13 @@ const Projects = () => {
                         {projects.map(project => {
                             return (<tr key={project.id}>
                                 <td scope="row">{project.id}</td>
+                                <td>{project.name}</td>
                                 <td>{project.description}</td>
                                 <td className="text-end">
                                     <Link to={"/projects/" + project.id}>
                                         <button className="btn btn-secondary btn-small mt-1 mb-1 mx-1">View</button>
                                     </Link>
-                                    <Link to={"/projects/" + project.id}>
+                                    <Link to={"/projects/" + project.id + "/edit"}>
                                         <button className="btn btn-secondary btn-small mt-1 mb-1">Edit</button>
                                     </Link>
                                 </td>

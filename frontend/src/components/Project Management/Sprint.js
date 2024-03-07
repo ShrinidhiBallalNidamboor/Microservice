@@ -29,6 +29,27 @@ const Sprint = () => {
         setSelectedIssue(issue);
     }
 
+    const handleDelete = () => {
+        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
+            method: "DELETE"
+        }).then(res => {
+            deleteIssue(selectedIssue);            
+            handleCloseModal();
+            setNotification({ type: 'success', message: 'Issue deleted successfully' });
+            setTimeout(() => {
+                setNotification(null);
+              }, 3000);
+        }).catch(err => {
+            alert("Error while deleting issue");
+            console.log(err);
+            handleCloseModal();
+            setNotification({ type: 'error', message: 'Failed to delete issue' });
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+        })
+    }
+
     const handleEdit = () => {
         fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues`, {
             method: "PUT",
@@ -82,6 +103,11 @@ const Sprint = () => {
     const updateIssue = (updatedIssue) => {
         console.log("Updating ", updatedIssue);
         setIssues(issues.map(issue => issue.id === updatedIssue.id ? updatedIssue : issue));
+        console.log(issues);
+    }
+    const deleteIssue = (updatedIssue) => {
+        console.log("Deleting ", updatedIssue);
+        setIssues(issues.filter(issue => issue.id !== updatedIssue.id));
         console.log(issues);
     }
 
@@ -179,6 +205,9 @@ const Sprint = () => {
                                     <div className="modal-footer">
                                         <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                                             Close
+                                        </button>
+                                        <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                                            Delete
                                         </button>
                                         <button type="button" className="btn btn-primary" onClick={handleEdit}>
                                             Edit

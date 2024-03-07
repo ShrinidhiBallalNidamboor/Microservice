@@ -26,16 +26,21 @@ app.use(express.json());
 
 // Add project in organization
 app.post('/projects', (req, res) => {
-    const { organization_id, description } = req.body;
+    const organization_id = req.query.organization_id;
+    const { name, description } = req.body;
+    if (!organization_id || !name || !description) {
+        res.status(400).send('Missing organization_id, name or description');
+        return;
+    }
     connection.beginTransaction((err) => {
         if (err) {
             console.error('Error beginning transaction: ', err);
             return;
         }
-        const query1 = 'INSERT INTO projects (description) VALUES (?)';
+        const query1 = 'INSERT INTO projects (name, description) VALUES (?, ?)';
         const query2 = 'INSERT INTO organization_projects (organization_id, project_id) VALUES (?, ?)';
         let projectId;
-        connection.query(query1, [description], (err, result1) => {
+        connection.query(query1, [name, description], (err, result1) => {
             if (err) {
                 return connection.rollback(() => {
                     console.error('Error adding  project', err);
@@ -69,6 +74,22 @@ app.post('/projects', (req, res) => {
 
 })
 
+app.put('/projects/:id', (req, res) => {
+    const projectId = parseInt(req.params.id);
+    const {name, description} = req.body;
+    if (!name || !description) {
+        res.status(400).send('Missing name or description');
+        return;
+    }
+    connection.query('UPDATE projects set name = ?, description = ? where id = ?', [name, description, projectId], (err, result2) => {
+        if (err) {
+            console.error('Error updating project', err);
+            res.status(500).send('Error updating project');
+            return;
+        }
+        return res.status(200).send("Project updated successfully");
+    });
+})
 // Fetch all projects in organization
 app.get('/projects', (req, res) => {
     const organization_id = req.query.organization_id;
@@ -90,6 +111,7 @@ app.get('/projects', (req, res) => {
 // Fetch project details by ID
 app.get('/projects/:id', (req, res) => {
     const projectId = req.params.id;
+    console.log("Get project " + projectId);
 
     connection.query('SELECT * FROM projects WHERE id = ?', [projectId], (err, results) => {
         if (err) {
@@ -102,7 +124,7 @@ app.get('/projects/:id', (req, res) => {
             res.status(404).send('Project not found');
             return;
         }
-
+        console.log(results[0]);
         res.json(results[0]);
     });
 });
@@ -263,6 +285,21 @@ app.put('/projects/:project_id/sprints/:sprint_id/issues', (req, res) => {
             return;
         }
         res.status(200).send("Issue updated successfully");
+    });
+});
+
+// Delete an issue
+app.delete('/projects/:project_id/sprints/:sprint_id/issues/:issue_id', (req, res) => {
+
+    const issueId = req.params.issue_id;
+
+    connection.query('DELETE from issues where id = ?', [issueId], (err, results) => {
+        if (err) {
+            console.error('Error deleting issue', err);
+            res.status(500).send('Error deleting issue');
+            return;
+        }
+        res.status(200).send(results.affectedRows + " issue deleted successfully");
     });
 });
 

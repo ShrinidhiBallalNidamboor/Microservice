@@ -13,7 +13,7 @@ const AddProjectMember = () => {
 
     const [userId, setUserId] = useState("");
     const [name, setName] = useState("");
-    const [role, setRole] = useState("Member");
+    const [role, setRole] = useState("");
 
     const handleRoleChange = (e) => setRole(e);
 
@@ -73,11 +73,11 @@ const AddProjectMember = () => {
                     <div class="form-group mb-3">
                         <label for="role">Role</label><br />
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" checked={role === "Lead"} name="role" id="lead" value="LEAD" onChange={() => handleRoleChange("Lead")} />
+                            <input class="form-check-input" type="radio" checked={role === "LEAD"} name="role" id="lead" value="LEAD" onChange={() => handleRoleChange("LEAD")} />
                             <label class="form-check-label" for="lead">Lead</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" checked={role === "Member"} name="role" id="member" value="MEMBER" onChange={() => handleRoleChange("Member")} />
+                            <input class="form-check-input" type="radio" checked={role === "MEMBER"} name="role" id="member" value="MEMBER" onChange={() => handleRoleChange("MEMBER")} />
                             <label class="form-check-label" for="member">Member</label>
                         </div>
                     </div>

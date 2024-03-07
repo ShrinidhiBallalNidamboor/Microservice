@@ -19,8 +19,8 @@ const ProjectSidebar = ({ active, projectId, projectName }) => {
             <div className={`sidebar-item ${isActive('backlog')} px-4 py-2`}>
               <Link to={`/projects/${projectId}/backlog`} className="sidebar-item-link">Backlog</Link>
             </div>
-            <div className={`sidebar-item ${isActive('information')} px-4 py-2`}>
-              <Link to={`/projects/${projectId}/information`} className="sidebar-item-link">Information</Link>
+            <div className={`sidebar-item ${isActive('chat')} px-4 py-2`}>
+              <Link to={`/projects/${projectId}/chat`} className="sidebar-item-link">Chat</Link>
             </div>
         </div>
       );
