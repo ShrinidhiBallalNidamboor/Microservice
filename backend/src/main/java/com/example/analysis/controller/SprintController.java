@@ -2,6 +2,7 @@ package com.example.analysis.controller;
 
 import com.example.analysis.entity.Sprint;
 import com.example.analysis.error.SprintNotFoundException;
+import com.example.analysis.helperClasses.SprintStats;
 import com.example.analysis.service.SprintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,12 @@ public class SprintController {
     public Sprint fetchByProjectId(@PathVariable("id") Long projectId){
 
         return sprintService.fetchSprintByProjectId(projectId);
+    }
+
+
+    @GetMapping("/sprints/stats/{id}")
+    public SprintStats getSprintStats(@PathVariable Long id) {
+        return sprintService.calculateSprintStats(id);
     }
 
 

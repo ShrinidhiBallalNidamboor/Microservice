@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-// import { Bar, Pie } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
-import { CategoryScale } from "chart.js";
-
+import { CategoryScale } from 'chart.js';
 import Navbar from '../Navbar';
 import './../../css/sprintpage-css.css';
 import Sprintstats from './SprintStats';
 
 Chart.register(CategoryScale);
 
-
 const SprintPage = () => {
     const { id } = useParams();
     const [showStats, setShowStats] = useState(false);
-    // const [showMember, setShowMember] = useState(false);
     const [issues, setIssues] = useState([]);
     const [sprintDetails, setSprintDetails] = useState({});
     const [showLabel, setShowLabel] = useState("Show sprint statistics");
-    // const [showLabel1, setShowLabel1] = useState("Show memberwise details");
+    const [statsData, setStatsData] = useState({});
     const [barChartData, setBarChartData] = useState({
         labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
         datasets: [
@@ -40,18 +36,9 @@ const SprintPage = () => {
         ],
     });
 
-    // // Sample sprint details
-    // var sprintDetails = {
-    //     id: null,
-    //     status: null,
-    //     startDate: null,
-    //     endDate: null,
-    // };
-
     const formatDateTime = (dateTimeString) => {
-
         if (!dateTimeString) {
-            return "N/A"; // Or handle accordingly based on your requirements
+            return "N/A";
         }
         const options = {
             weekday: 'long',
@@ -62,15 +49,47 @@ const SprintPage = () => {
             minute: 'numeric',
             hour12: true
         };
-
-        // Explicitly set the format to ISO 8601
         const formattedDate = new Date(dateTimeString.replace(' ', 'T')).toLocaleString(undefined, options);
-
         return formattedDate;
     };
 
-
     useEffect(() => {
+        const fetchSprintStats = async () => {
+            try {
+                const response = await fetch(`http://localhost:8082/sprints/stats/${id}`);
+                const data = await response.json();
+                setBarChartData({
+                    labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
+                    datasets: [
+                        {
+                            label: 'Task Status Breakdown',
+                            backgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
+                            data: data.taskStatusCounts,
+                        },
+                    ],
+                });
+                setPieChartData({
+                    labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
+                    datasets: [
+                        {
+                            data: data.taskStatusCounts,
+                            backgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
+                            hoverBackgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
+                        },
+                    ],
+                });
+                setStatsData({
+                    memberStatsMap: data.memberStatsMap,
+                    teamStats: {
+                        donePoints: data.donePoints,
+                        totalPoints: data.totalPoints
+                    }
+                })
+            } catch (error) {
+                console.error('Error fetching sprint stats:', error);
+            }
+        };
+
         const fetchIssues = async () => {
             try {
                 const response = await fetch(`http://localhost:8082/issues/sprintid/${id}`);
@@ -82,106 +101,20 @@ const SprintPage = () => {
             }
         };
 
-        fetchIssues();
-    }, [id]);  // Fetch issues when the 'id' parameter changes
 
-    // Dummy data for issues
-    // const issues = [
-    //     { id: 1, name: 'Issue 1', creator: 'John Doe', status: 'TODO', storyPoints: 3 },
-    //     { id: 2, name: 'Issue 2', creator: 'Jane Smith', status: 'IN_PROGRESS', storyPoints: 5 },
-    //     { id: 3, name: 'Issue 3', creator: 'Bob Johnson', status: 'BLOCKED', storyPoints: 2 },
-    //     { id: 4, name: 'Issue 4', creator: 'Alice Brown', status: 'BLOCKED', storyPoints: 4 },
-    //     { id: 5, name: 'Issue 5', creator: 'Charlie Green', status: 'TODO', storyPoints: 1 },
-    //     { id: 6, name: 'Issue 6', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 3 },
-    //     { id: 7, name: 'Issue 7', creator: 'Eva Black', status: 'BLOCKED', storyPoints: 2 },
-    //     { id: 8, name: 'Issue 8', creator: 'Frank Gray', status: 'DONE', storyPoints: 8 },
-    //     { id: 9, name: 'Issue 9', creator: 'Frank Gray', status: 'BLOCKED', storyPoints: 5 },
-    //     { id: 10, name: 'Issue 10', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
-    //     { id: 11, name: 'Issue 11', creator: 'Frank Gray', status: 'IN_PROGRESS', storyPoints: 5 },
-    //     { id: 12, name: 'Issue 12', creator: 'David White', status: 'IN_PROGRESS', storyPoints: 2 },
-    //     { id: 13, name: 'Issue 13', creator: 'John Doe', status: 'DONE', storyPoints: 3 },
-    //     { id: 14, name: 'Issue 14', creator: 'Jane Smith', status: 'DONE', storyPoints: 1 },
-    // ];
+        if (showStats) {
+            fetchSprintStats();
+        }
 
+        if (!showStats) {
+            fetchIssues();
+        }
 
-    // useEffect(() => {
-    //     // Initialize charts here
-    //     const barChartCanvas = document.getElementById('barChartCanvas');
-    //     const pieChartCanvas = document.getElementById('pieChartCanvas');
-
-    //     const barChart = new Chart(barChartCanvas, {
-    //         type: 'bar',
-    //         data: barChartData,
-    //     });
-
-    //     const pieChart = new Chart(pieChartCanvas, {
-    //         type: 'pie',
-    //         data: pieChartData,
-    //     });
-
-    //     return () => {
-    //         // Cleanup and destroy charts here
-    //         // Make sure to destroy the charts to prevent memory leaks
-    //         barChart.destroy();
-    //         pieChart.destroy();
-    //     };
-    // }, [barChartData, pieChartData]); // Dependency array includes chart data to watch for changes
+    }, [id, showStats]);
 
     const toggleStats = () => {
-
-        if (!showStats) {
-            setPieChartData({
-                labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
-                datasets: [
-                    {
-                        data: getTaskStatusCounts(),
-                        backgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
-                        hoverBackgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
-                    },
-                ],
-            });
-
-            setBarChartData({
-                labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
-                datasets: [
-                    {
-                        data: getTaskStatusCounts(),
-                        backgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
-                        hoverBackgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
-                    },
-                ],
-            });
-
-
-        }
-
-        if (!showStats) {
-            setShowLabel("Show sprint overview")
-        } else {
-            setShowLabel("Show sprint statistics")
-        }
-
         setShowStats(!showStats);
-
-
-    };
-
-    // const toggleMember = () => {
-
-    //     if (showLabel1 == "Show sprint statistics") { 
-    //         setShowLabel1("Go back") 
-    //     }
-    //     else {
-    //         setShowLabel1("Show sprint statistics") 
-    //     }
-    // }
-
-    const getTaskStatusCounts = () => {
-        const statusCounts = { TODO: 0, IN_PROGRESS: 0, BLOCKED: 0, DONE: 0 };
-        issues.forEach((issue) => {
-            statusCounts[issue.status]++;
-        });
-        return Object.values(statusCounts);
+        setShowLabel(showStats ? "Show sprint statistics" : "Show sprint overview");
     };
 
     return (
@@ -220,8 +153,8 @@ const SprintPage = () => {
                     </div>
                 </div>
             )}
-            {showStats && sprintDetails && issues && (
-                <Sprintstats pieChartData={pieChartData} barChartData={barChartData} issues={issues} />
+            {showStats && statsData && (
+                <Sprintstats pieChartData={pieChartData} barChartData={barChartData} statsData={statsData} />
             )}
         </div>
     );

@@ -3,56 +3,37 @@ import { Bar, Pie } from 'react-chartjs-2';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import './../../css/sprintpage-css.css';
 
-const Sprintstats = ({ barChartData, pieChartData, issues }) => {
+const Sprintstats = ({ barChartData, pieChartData, statsData }) => {
+
     const renderTeamProgressBars = () => {
-        const teamPoints = {};
+        const teamPoints = statsData?.teamStats;
 
-        issues.forEach((issue) => {
-            if (issue.status === 'DONE') {
-                if (!teamPoints.team) {
-                    teamPoints.team = { done: 0, total: 0 };
-                }
-                teamPoints.team.done += issue.points;
-            }
-
-            if (!teamPoints.team) {
-                teamPoints.team = { done: 0, total: 0 };
-            }
-            teamPoints.team.total += issue.points;
-        });
+        if (!teamPoints) {
+            return <div className="progress-container">Team Points Progress: N/A</div>;
+        }
 
         return (
             <div className="progress-container">
                 <h2>Team Points Progress</h2>
-                {renderBars(teamPoints.team, 'Team')}
+                {renderBars(teamPoints, 'Team')}
             </div>
         );
     };
 
     const renderMemberProgressBars = () => {
-        const memberPoints = {};
+        const memberPoints = statsData?.memberStatsMap;
 
-        issues.forEach((issue) => {
-            if (issue.status === 'DONE') {
-                if (!memberPoints[issue.ownerName]) {
-                    memberPoints[issue.ownerName] = { done: 0, total: 0 };
-                }
-                memberPoints[issue.ownerName].done += issue.points;
-            }
-
-            if (!memberPoints[issue.ownerName]) {
-                memberPoints[issue.ownerName] = { done: 0, total: 0 };
-            }
-            memberPoints[issue.ownerName].total += issue.points;
-        });
+        if (!memberPoints || Object.keys(memberPoints).length === 0) {
+            return <div className="progress-container">Member-wise Points Progress: N/A</div>;
+        }
 
         return (
             <div className="progress-container">
                 <h2>Member-wise Points Progress</h2>
                 {Object.keys(memberPoints).map((member) => (
                     <div key={member} className="progress-container">
-                        <p>{`${member}'s Progress: ${(memberPoints[member].done / memberPoints[member].total * 100 || 0).toFixed(2)}%`}</p>
-                        <ProgressBar striped variant={getVariant(memberPoints[member].done, memberPoints[member].total)} now={(memberPoints[member].done / memberPoints[member].total * 100 || 0)} />
+                        <p>{`${member}'s Progress: ${(memberPoints[member].donePoints / memberPoints[member].totalPoints * 100 || 0).toFixed(2)}%`}</p>
+                        <ProgressBar striped variant={getVariant(memberPoints[member].donePoints, memberPoints[member].totalPoints)} now={(memberPoints[member].donePoints / memberPoints[member].totalPoints * 100 || 0)} />
                     </div>
                 ))}
             </div>
@@ -62,8 +43,8 @@ const Sprintstats = ({ barChartData, pieChartData, issues }) => {
     const renderBars = (points, label) => {
         return (
             <div key={label} className="progress-container">
-                <p>{`${label}'s Progress: ${(points.done / points.total * 100 || 0).toFixed(2)}%`}</p>
-                <ProgressBar striped variant={getVariant(points.done, points.total)} now={(points.done / points.total * 100 || 0)} />
+                <p>{`${label}'s Progress: ${(points.donePoints / points.totalPoints * 100 || 0).toFixed(2)}%`}</p>
+                <ProgressBar striped variant={getVariant(points.donePoints, points.totalPoints)} now={(points.donePoints / points.totalPoints * 100 || 0)} />
             </div>
         );
     };

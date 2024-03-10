@@ -2,6 +2,7 @@ package com.example.analysis.service;
 
 import com.example.analysis.entity.Sprint;
 import com.example.analysis.error.SprintNotFoundException;
+import com.example.analysis.helperClasses.SprintStats;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface SprintService {
 //    public Sprint updateSprintById(Long sprintId, Sprint sprint);
 
     public Sprint fetchSprintByProjectId(Long projectId);
+
+    public SprintStats calculateSprintStats(Long sprintId);
 }

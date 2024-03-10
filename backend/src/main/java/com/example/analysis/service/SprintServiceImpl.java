@@ -1,20 +1,26 @@
 package com.example.analysis.service;
 
+import com.example.analysis.entity.Issue;
 import com.example.analysis.entity.Sprint;
 import com.example.analysis.error.SprintNotFoundException;
+import com.example.analysis.helperClasses.MemberStats;
+import com.example.analysis.helperClasses.SprintStats;
+import com.example.analysis.repository.IssueRepository;
 import com.example.analysis.repository.SprintRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SprintServiceImpl implements SprintService{
 
     @Autowired
     private SprintRepository sprintRepository;
+
+    @Autowired
+    private IssueRepository issueRepository;
 
     @Override
     public Sprint saveSprint(Sprint sprint) {
@@ -70,6 +76,65 @@ public class SprintServiceImpl implements SprintService{
     @Override
     public Sprint fetchSprintByProjectId(Long projectId) {
         return sprintRepository.findByProjectId(projectId);
+    }
+
+
+    @Override
+    public SprintStats calculateSprintStats(Long sprintId) {
+        Sprint sprint = sprintRepository.findById(sprintId)
+                .orElseThrow(() -> new EntityNotFoundException("Sprint not found with id: " + sprintId));
+
+
+        List<Issue> issues = issueRepository.findBySprintId(sprintId);
+
+        SprintStats sprintStats = new SprintStats();
+        sprintStats.setStartDate(sprint.getStartDate());
+        sprintStats.setEndDate(sprint.getEndDate());
+        sprintStats.setStatus(sprint.getStatus());
+        sprintStats.setDuration(sprint.getDuration());
+
+        int totalPoints = 0;
+        int donePoints = 0;
+
+        // Initialize task status counts
+        int todoCount = 0;
+        int inProgressCount = 0;
+        int blockedCount = 0;
+        int doneCount = 0;
+
+        Map<String, MemberStats> memberStatsMap = new HashMap<>();
+
+        for (Issue issue : issues) {
+            totalPoints += issue.getPoints();
+            if ("DONE".equals(issue.getStatus())) {
+                donePoints += issue.getPoints();
+                doneCount++;
+            } else if ("TODO".equals(issue.getStatus())) {
+                todoCount++;
+            } else if ("IN_PROGRESS".equals(issue.getStatus())) {
+                inProgressCount++;
+            } else if ("BLOCKED".equals(issue.getStatus())) {
+                blockedCount++;
+            }
+
+            // Update member-wise points
+            String ownerName = issue.getOwnerName();
+            MemberStats memberStats = memberStatsMap.getOrDefault(ownerName, new MemberStats());
+            memberStats.setTotalPoints(memberStats.getTotalPoints() + issue.getPoints());
+            if ("DONE".equals(issue.getStatus())) {
+                memberStats.setDonePoints(memberStats.getDonePoints() + issue.getPoints());
+            }
+            memberStatsMap.put(ownerName, memberStats);
+        }
+
+        // Set counts in SprintStats for chart data
+        sprintStats.setTotalPoints(totalPoints);
+        sprintStats.setDonePoints(donePoints);
+        sprintStats.setTaskStatusCounts(Arrays.asList(todoCount, inProgressCount, blockedCount, doneCount));
+        sprintStats.setMemberStatsMap(memberStatsMap);
+
+
+        return sprintStats;
     }
 
 }
