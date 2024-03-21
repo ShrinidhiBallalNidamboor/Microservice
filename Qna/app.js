@@ -10,7 +10,7 @@ const port = 8000;
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'admin',
+    password: 'password123?',
     database: 'qna'
 });
 
@@ -154,12 +154,12 @@ app.get('/Qna/api/questions/:questionId/answers', (req, res) => {
     const questionId = req.params.questionId;
     // Query the database to get answers for the specified questionId
     connection.query('SELECT * FROM answers WHERE question_id = ?', [questionId], (error, results) => {
-      if (error) {
-        console.error('Error fetching answers:', error);
-        res.status(500).json({ error: 'Error fetching answers' });
-      } else {
-        res.json(results);
-      }
+        if (error) {
+            console.error('Error fetching answers:', error);
+            res.status(500).json({ error: 'Error fetching answers' });
+        } else {
+            res.json(results);
+        }
     });
 });
 
@@ -173,16 +173,16 @@ app.post('/Qna/api/answers/:questionId', (req, res) => {
     connection.query(`INSERT INTO answers (answer, user_name, question_id) 
     VALUES ('${req.body.answer}', '${req.body.userName}', ${req.body.quesId})`, (error, results) => {
         if (error) {
-          console.error('Error fetching answers:', error);
-          res.status(500).json({ error: 'Error fetching answers' });
+            console.error('Error fetching answers:', error);
+            res.status(500).json({ error: 'Error fetching answers' });
         }
-      });
+    });
 
 
     res.json({ message: 'successful' });
-  });
-  
-  
+});
+
+
 
 // Start the server
 app.listen(port, () => {

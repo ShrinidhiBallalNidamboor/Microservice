@@ -8,7 +8,7 @@ const Login = () => {
   const navigate = useNavigate();
   const handleSubmit = async () => {
     try {
-      const res = await fetch("http://localhost:8000/login",
+      const res = await fetch("http://localhost:9000/login",
         {
           method: "POST",
           headers: {

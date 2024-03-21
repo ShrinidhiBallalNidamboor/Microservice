@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const Register = () => {
     const navigate = useNavigate();
     const handleSubmit = () => {
-        fetch("http://localhost:8000/register",
+        fetch("http://localhost:9000/register",
             {
                 method: "POST",
                 headers: {

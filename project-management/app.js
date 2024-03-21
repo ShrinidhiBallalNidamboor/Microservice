@@ -3,14 +3,14 @@ const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-const PORT = 4000;
+const PORT = 5000;
 
 app.use(cors());
 
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'admin',
+    password: 'password123?',
     database: 'project_management'
 });
 
@@ -76,7 +76,7 @@ app.post('/projects', (req, res) => {
 
 app.put('/projects/:id', (req, res) => {
     const projectId = parseInt(req.params.id);
-    const {name, description} = req.body;
+    const { name, description } = req.body;
     if (!name || !description) {
         res.status(400).send('Missing name or description');
         return;
@@ -149,7 +149,7 @@ app.get('/projects/:id/members', (req, res) => {
 app.post('/projects/:id/members', (req, res) => {
     const projectId = req.params.id;
 
-    const {member} = req.body;
+    const { member } = req.body;
     connection.query('INSERT into project_members (project_id, name, user_id, role) VALUES (?, ?, ?, ?)', [parseInt(projectId), member.name, member.user_id, member.role], (err, results) => {
         if (err) {
             console.error('Error adding project member', err);
@@ -180,6 +180,7 @@ app.get('/projects/:project_id/sprints/:sprint_id', (req, res) => {
     const projectId = req.params.project_id;
     const sprintId = req.params.sprint_id;
 
+    console.log("in get projects")
     connection.query('SELECT * FROM sprints WHERE project_id = ? and id = ?', [projectId, sprintId], (err, results) => {
         if (err) {
             console.error('Error fetching sprint information', err);
@@ -262,7 +263,7 @@ app.put('/projects/:project_id/sprints/:sprint_id/complete', (req, res) => {
                     return;
                 });
             }
-            
+
             connection.query(query2, [sprintId], (err, result2) => {
                 if (err) {
                     return connection.rollback(() => {
@@ -349,7 +350,7 @@ app.delete('/projects/:project_id/sprints/:sprint_id/issues/:issue_id', (req, re
     });
 });
 
-app.get("*", (req, res) =>{
+app.get("*", (req, res) => {
     console.log(req.url);
     res.status(404).send("Cannot find resource")
 })
