@@ -18,7 +18,7 @@ const QuestionList = () => {
 
     useEffect(() => {
         // Fetch questions from the backend when the component mounts
-        fetch('http://localhost:4000/Qna/questions')
+        fetch('http://localhost:4000/Qna/Userquestions')
             .then(response => response.json())
             .then(questionsData => {
                 setQuestions(questionsData);

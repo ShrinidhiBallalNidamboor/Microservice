@@ -17,7 +17,7 @@ const QuestionAnswers = () => {
             console.log(questionId)
             if (questionId) {
                 try {
-                    const response = await fetch(`http://localhost:3000/api/questions/${questionId}/answers`);
+                    const response = await fetch(`http://localhost:4000/Qna/api/questions/${questionId}/answers`);
                     const data = await response.json();
                     
                     setAnswers(data);
@@ -37,7 +37,7 @@ const QuestionAnswers = () => {
         const questionId = getUrlParameter('questionId');
 
         try {
-            const response = await fetch(`http://localhost:3000/api/answers/${questionId}`, {
+            const response = await fetch(`http://localhost:4000/Qna/api/answers/${questionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ const QuestionAnswers = () => {
 
     const handleUpvoteAnswer = async (answerId) => {
         try {
-            const response = await fetch(`http://localhost:3000/answers/upvote/${answerId}`, { method: 'POST' });
+            const response = await fetch(`http://localhost:4000/Qna/answers/upvote/${answerId}`, { method: 'POST' });
             const data = await response.json();
             console.log(data.message);
 
@@ -91,7 +91,7 @@ const QuestionAnswers = () => {
 
     const handleDownvoteAnswer = async (answerId) => {
         try {
-            const response = await fetch(`http://localhost:3000/answers/downvote/${answerId}`, { method: 'POST' });
+            const response = await fetch(`http://localhost:4000/Qna/answers/downvote/${answerId}`, { method: 'POST' });
             const data = await response.json();
             console.log(data.message);
 
