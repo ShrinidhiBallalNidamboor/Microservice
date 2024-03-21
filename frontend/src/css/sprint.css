@@ -16,8 +16,24 @@
 }
 
 .issue-status {
-    border: 1px solid #e0e0e0;
+    /* border: 1px solid #e0e0e0; */
     padding: 0;
+}
+
+.issue-creator {
+    /* border-radius: 50%;
+    background-color: #455a64;
+    width: 40px;
+    height: 40px;
+    color: white;
+    padding: 5px; */
+}
+
+.status-type{
+    background-color: #eeeeee !important;
+    font-weight: 400 !important;
+    color:#455a64;
+    margin: 5px;
 }
 
 .notification {

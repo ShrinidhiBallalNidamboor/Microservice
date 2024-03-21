@@ -6,7 +6,7 @@ import '../../css/sprint.css';
 import { Link } from "react-router-dom";
 
 // Sprint dashboard component
-const Sprint = () => {
+const Backlog = () => {
 
     const [issues, setIssues] = useState([]);
     const { projectId, sprintId } = useParams();
@@ -16,7 +16,7 @@ const Sprint = () => {
 
     useEffect(() => {
         
-        fetch("http://localhost:4000/projects/" + projectId + "/sprints/" + sprintId + "/issues")
+        fetch("http://localhost:4000/projects/" + projectId + "/backlog")
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -116,19 +116,14 @@ const Sprint = () => {
             <Navbar active="projects"></Navbar>
             <div className="row">
                 <div className="col-2">
-                    <ProjectSidebar active="sprints" projectId={projectId}></ProjectSidebar>
+                    <ProjectSidebar active="backlog" projectId={projectId}></ProjectSidebar>
                 </div>
                 <div className="col p-4">
-                    <h3>Sprint dashboard</h3>
-                    <Link to={`/projects/${projectId}/sprints/${sprintId}/issues/new`}>
-                        <button className="btn btn-primary my-3">
-                            Create Issue
-                        </button>
-                    </Link>
+                    <h3 className="mb-3">Backlog</h3>
 
                     <div className="dashboard row center mx-1">
                         <div className="col todo issue-status">
-                            <h6 className="bg-light status-type p-3">Todo</h6>
+                            <h6 className="bg-dark status-type p-3">Todo</h6>
                             {issues.map(issue => {
                                 return issue.status == "TODO" ? showIssue(issue) : "";
                             })}
@@ -234,4 +229,4 @@ const Sprint = () => {
     )
 }
 
-export default Sprint;
+export default Backlog;

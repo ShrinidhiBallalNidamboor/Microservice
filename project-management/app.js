@@ -93,6 +93,7 @@ app.put('/projects/:id', (req, res) => {
 // Fetch all projects in organization
 app.get('/projects', (req, res) => {
     const organization_id = req.query.organization_id;
+    console.log("Get projects", organization_id)
     if (!organization_id) {
         res.status(400).send('Missing organization_id parameter');
         return;
@@ -205,6 +206,20 @@ app.get('/projects/:project_id/sprints/:sprint_id/issues', (req, res) => {
     });
 });
 
+// fetch backlog issues
+app.get('/projects/:project_id/backlog', (req, res) => {
+    const projectId = req.params.project_id;
+    connection.query('select issues.id, sprint_id, description, issues.status, owner_id, owner_name, points, is_backlog from sprints inner join issues where sprints.id = issues.sprint_id and project_id = ? and is_backlog = 1', [projectId], (err, results) => {
+        if (err) {
+            console.error('Error fetching backlog issues', err);
+            res.status(500).send('Error fetching backlog issues');
+            return;
+        }
+
+        res.json(results);
+    });
+});
+
 // Create a new sprint
 app.post('/projects/:project_id/sprints', (req, res) => {
     const projectId = req.params.project_id;
@@ -231,14 +246,45 @@ app.put('/projects/:project_id/sprints/:sprint_id/complete', (req, res) => {
 
     const sprintId = parseInt(req.params.sprint_id);
 
-    connection.query('UPDATE sprints SET status = "Completed", end_date = CURDATE() where id = ?;', [sprintId], (err, results) => {
+    connection.beginTransaction((err) => {
         if (err) {
-            console.error('Error completing new sprint', err);
-            res.status(500).send('Error completing new sprint');
-            return;
+            console.error('Error beginning transaction: ', err);
+            res.status(500).send('Error completing sprint');
         }
-        res.status(200).send("Sprint completed successfully");
-    });
+        const query1 = 'UPDATE sprints SET status = "Completed", end_date = CURDATE() where id = ?;';
+        const query2 = 'UPDATE issues set is_backlog = 1 where sprint_id = ? and status <> "DONE"';
+
+        connection.query(query1, [sprintId], (err, result1) => {
+            if (err) {
+                return connection.rollback(() => {
+                    console.error('Error adding  project', err);
+                    res.status(500).send('Error adding project');
+                    return;
+                });
+            }
+            
+            connection.query(query2, [sprintId], (err, result2) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        console.error('Error completing sprint', err);
+                        res.status(500).send('Error completing sprint');
+                        return;
+                    });
+                }
+            });
+        });
+
+        connection.commit((err) => {
+            if (err) {
+                return connection.rollback(() => {
+                    console.error('Error adding  project', err);
+                    res.status(500).send('Error adding project');
+                    return;
+                });
+            }
+        });
+        res.status(200).send('Sprint completed successfully');
+    })
 });
 
 
@@ -302,6 +348,11 @@ app.delete('/projects/:project_id/sprints/:sprint_id/issues/:issue_id', (req, re
         res.status(200).send(results.affectedRows + " issue deleted successfully");
     });
 });
+
+app.get("*", (req, res) =>{
+    console.log(req.url);
+    res.status(404).send("Cannot find resource")
+})
 
 app.listen(PORT, () => {
     console.log("Project Mangement Microservice is running");

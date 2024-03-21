@@ -48,6 +48,7 @@ CREATE TABLE issues (
     owner_id VARCHAR(50) NOT NULL,
     owner_name VARCHAR(20) NOT NULL,
     points INT DEFAULT 0,
+    is_backlog TINYINT(1) NOT NULL DEFAULT 0,
     FOREIGN KEY (sprint_id) REFERENCES sprints(id)
 );
 

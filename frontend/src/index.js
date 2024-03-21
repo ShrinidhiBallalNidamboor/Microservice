@@ -16,6 +16,7 @@ import AddProjectMember from './components/Project Management/AddProjectMember';
 import Sprint from './components/Project Management/Sprint';
 import AddIssue from './components/Project Management/AddIssue';
 import EditProject from './components/Project Management/EditProject';
+import Backlog from './components/Project Management/Backlog';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -35,6 +36,7 @@ root.render(
 
         <Route path='/projects/new' element={<AddProject/>}></Route>
         <Route path='/projects/:projectId/edit' element={<EditProject/>}></Route>
+        <Route path='/projects/:projectId/backlog' element={<Backlog/>}></Route>
         <Route path='/projects/:projectId/sprints/:sprintId' element={<Sprint/>}></Route>        
         <Route path='/projects/:projectId/sprints/:sprintId/issues/new' element={<AddIssue/>}></Route>
       </Routes>
