@@ -12,10 +12,10 @@ const Sprint = () => {
     const { projectId, sprintId } = useParams();
 
     const [selectedIssue, setSelectedIssue] = useState(null);
-    const [notification, setNotification] = useState(null);    
+    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
-        
+
         fetch("http://localhost:4000/projects/" + projectId + "/sprints/" + sprintId + "/issues")
             .then(res => res.json())
             .then(data => {
@@ -33,20 +33,20 @@ const Sprint = () => {
         fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
             method: "DELETE"
         }).then(res => {
-            deleteIssue(selectedIssue);            
+            deleteIssue(selectedIssue);
             handleCloseModal();
             setNotification({ type: 'success', message: 'Issue deleted successfully' });
             setTimeout(() => {
                 setNotification(null);
-              }, 3000);
+            }, 3000);
         }).catch(err => {
             alert("Error while deleting issue");
             console.log(err);
             handleCloseModal();
             setNotification({ type: 'error', message: 'Failed to delete issue' });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
         })
     }
 
@@ -67,20 +67,20 @@ const Sprint = () => {
             })
         }).then(res => {
             updateIssue(selectedIssue);
-            
+
             handleCloseModal();
             setNotification({ type: 'success', message: 'Issue updated successfully' });
             setTimeout(() => {
                 setNotification(null);
-              }, 3000);
+            }, 3000);
         }).catch(err => {
             alert("Error while updating issue");
             console.log(err);
             handleCloseModal();
             setNotification({ type: 'error', message: 'Failed to update issue' });
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
+            setTimeout(() => {
+                setNotification(null);
+            }, 3000);
         })
     };
 
@@ -91,7 +91,7 @@ const Sprint = () => {
 
     const showIssue = (issue) => {
         return (
-            <Link key={issue.id} onClick={() => handleIssueClick(issue)} style={{ textDecoration: 'none', color: 'inherit'}}>
+            <Link key={issue.id} onClick={() => handleIssueClick(issue)} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="p-3 bg-light my-1 mx-1 issue">
                     <h5 className="issue-desc">{issue.description}</h5>
                     <div className="issue-creator">{issue.owner_name}</div>
@@ -125,7 +125,17 @@ const Sprint = () => {
                             Create Issue
                         </button>
                     </Link>
+                    <Link to={`/projects/${projectId}/sprints/${sprintId}/analysis`}>
+                        {/* <div className="stats-button-container"> */}
+                        <button className='btn btn-success mx-3 my-3'>
+                            Show Stats
+                        </button>
+                        {/* </div> */}
+                    </Link>
 
+                    {/* <button className='stats-button' onClick={toggleMember}>
+                    {showLabel1}
+                </button> */}
                     <div className="dashboard row center mx-1">
                         <div className="col todo issue-status">
                             <h6 className="bg-light status-type p-3">Todo</h6>
@@ -153,84 +163,88 @@ const Sprint = () => {
                         </div>
 
                     </div>
-                    {selectedIssue && (
-                        <div className="modal" tabIndex="-1" role="dialog" style={{ display: 'block'}}>
-                            <div className="modal-dialog" role="document">
-                                <div className="modal-content" >
-                                    <div className="modal-header">
-                                        <h5 className="modal-title">Edit Issue</h5>
-                                        {/* <button type="button" className="close" onClick={handleCloseModal}>
+                </div>
+
+
+                {selectedIssue && (
+                    <div className="modal" tabIndex="-1" role="dialog" style={{ display: 'block' }}>
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content" >
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Edit Issue</h5>
+                                    {/* <button type="button" className="close" onClick={handleCloseModal}>
                                         <span>&times;</span>
                                     </button> */}
-                                    </div>
-                                    <div className="modal-body text-left">
+                                </div>
+                                <div className="modal-body text-left">
 
-                                        <div className="form-group mb-3">
-                                            <label htmlFor="description" className='mb-2'>Description</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                id="description"
-                                                value={selectedIssue.description}
-                                                required
-                                                onChange={(e) => setSelectedIssue((state) => {return ({...state, description: e.target.value})})}
-                                            />
-                                        </div>
-                                        <div className="form-group mb-3">
-                                            <label htmlFor="status" className='mb-2'>Status</label>
-                                            <select
-                                                
-                                                className="form-control"
-                                                id="status"onChange={(e) => setSelectedIssue((state) => {return ({...state, status: e.target.value})})}
-                                            >
-                                                <option value="TODO" selected={selectedIssue.status == "TODO"}>Todo</option>
-                                                <option value="IN_PROGRESS" selected={selectedIssue.status == "IN_PROGRESS"}>In Progress</option>
-                                                <option value="BLOCKED" selected={selectedIssue.status == "BLOCKED"}>Blocked</option>
-                                                <option value="DONE" selected={selectedIssue.status == "DONE"}>Done</option>
+                                    <div className="form-group mb-3">
+                                        <label htmlFor="description" className='mb-2'>Description</label>
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            id="description"
+                                            value={selectedIssue.description}
+                                            required
+                                            onChange={(e) => setSelectedIssue((state) => { return ({ ...state, description: e.target.value }) })}
+                                        />
+                                    </div>
+                                    <div className="form-group mb-3">
+                                        <label htmlFor="status" className='mb-2'>Status</label>
+                                        <select
 
-                                            </select>
-                                        </div>
-                                        <div className="form-group mb-3">
-                                            <label htmlFor="points" className='mb-2'>Points</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                id="points"
-                                                value={selectedIssue.points}
-                                                required
-                                                onChange={(e) => setSelectedIssue((state) => {return ({...state, points: e.target.value})})}
-                                            />
-                                        </div>
+                                            className="form-control"
+                                            id="status" onChange={(e) => setSelectedIssue((state) => { return ({ ...state, status: e.target.value }) })}
+                                        >
+                                            <option value="TODO" selected={selectedIssue.status == "TODO"}>Todo</option>
+                                            <option value="IN_PROGRESS" selected={selectedIssue.status == "IN_PROGRESS"}>In Progress</option>
+                                            <option value="BLOCKED" selected={selectedIssue.status == "BLOCKED"}>Blocked</option>
+                                            <option value="DONE" selected={selectedIssue.status == "DONE"}>Done</option>
+
+                                        </select>
                                     </div>
-                                    <div className="modal-footer">
-                                        <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                                            Close
-                                        </button>
-                                        <button type="button" className="btn btn-danger" onClick={handleDelete}>
-                                            Delete
-                                        </button>
-                                        <button type="button" className="btn btn-primary" onClick={handleEdit}>
-                                            Edit
-                                        </button>
+                                    <div className="form-group mb-3">
+                                        <label htmlFor="points" className='mb-2'>Points</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            id="points"
+                                            value={selectedIssue.points}
+                                            required
+                                            onChange={(e) => setSelectedIssue((state) => { return ({ ...state, points: e.target.value }) })}
+                                        />
                                     </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
+                                        Close
+                                    </button>
+                                    <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                                        Delete
+                                    </button>
+                                    <button type="button" className="btn btn-primary" onClick={handleEdit}>
+                                        Edit
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    )}
-                    {issues.length == 0 ?
-                        <h5 className="center mt-5">
-                            No issues have been added to this sprint
-                        </h5>
-                        : ""}
-                </div>
+                    </div>
+                )}
+                {issues.length == 0 ?
+                    <h5 className="center mt-5">
+                        No issues have been added to this sprint
+                    </h5>
+                    : ""}
             </div>
-            
-            {notification && (
-                <div className={`notification text-white ${notification.type == 'success' ? "bg-success": "bg-dander"}`}>
-                {notification.message}
-                </div>
-            )}
-        </div>
+
+            {
+                notification && (
+                    <div className={`notification text-white ${notification.type == 'success' ? "bg-success" : "bg-dander"}`}>
+                        {notification.message}
+                    </div>
+                )
+            }
+        </div >
     )
 }
 

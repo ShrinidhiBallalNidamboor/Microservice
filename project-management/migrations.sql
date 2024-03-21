@@ -45,6 +45,7 @@ CREATE TABLE issues (
     sprint_id INT NOT NULL,
     description VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL,
+    start_date DATE NOT NULL,
     owner_id VARCHAR(50) NOT NULL,
     owner_name VARCHAR(20) NOT NULL,
     points INT DEFAULT 0,
@@ -71,23 +72,23 @@ INSERT INTO project_members (project_id, name, user_id, role) VALUES (1, "Chetan
 INSERT INTO project_members (project_id, name, user_id, role) VALUES (1, "Suchin", "suchin@btp.com", "MEMBER");
 -- INSERT INTO project_members (project_id, name, user_id, role) VALUES (1, "4", "MEMBER");
 
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 1", "DONE", "Harry", "1", 10);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 2", "DONE", "Harry", "2", 5);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 3", "DONE", "Harry", "3", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 1","DONE",  curdate(), "Harry", "1", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 2",  "DONE",curdate(),  "Harry", "2", 5);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 3",  "DONE",  curdate(), "Harry", "3", 10);
 
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 1", "TODO", "Chethan", "1", 10);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 2", "TODO", "Chethan", "2", 5);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 3", "TODO", "Chethan", "3", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 1", "TODO", curdate(),  "Chethan", "1", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 2", "TODO", curdate(),  "Chethan", "2", 5);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 3", "TODO", curdate(),  "Chethan", "3", 10);
 
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 1", "IN_PROGRESS", "Suchin", "1", 10);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 2", "IN_PROGRESS", "Suchin", "2", 5);
-INSERT INTO issues (sprint_id, description, status, owner_name, owner_id, points)
-    VALUES (1, "Issue 3", "IN_PROGRESS", "Suchin", "3", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 1", "IN_PROGRESS", curdate(),  "Suchin", "1", 10);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 2", "IN_PROGRESS",curdate(),  "Suchin", "2", 5);
+INSERT INTO issues (sprint_id, description, status, start_date, owner_name, owner_id, points)
+    VALUES (1, "Issue 3", "IN_PROGRESS", curdate(), "Suchin", "3", 10);
