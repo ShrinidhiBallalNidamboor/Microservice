@@ -11,6 +11,9 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -104,7 +107,34 @@ public class SprintServiceImpl implements SprintService{
 
         Map<String, MemberStats> memberStatsMap = new HashMap<>();
 
+        int[] issuesByAgeRange = new int[4];
+
+        LocalDateTime currentDate = LocalDateTime.now();
+
         for (Issue issue : issues) {
+
+
+            if ("IN_PROGRESS".equals(issue.getStatus()) || "TODO".equals(issue.getStatus())) {
+
+                LocalDateTime startDate = issue.getStartDate();
+
+                // Calculate the age in days
+                long ageInDays = ChronoUnit.DAYS.between(startDate, currentDate);
+
+                // Categorize tasks based on age
+                if (ageInDays >= 0 && ageInDays <= 10) {
+                    issuesByAgeRange[0]++;
+                } else if (ageInDays > 10 && ageInDays <= 20) {
+                    issuesByAgeRange[1]++;
+                } else if (ageInDays > 20 && ageInDays <= 30) {
+                    issuesByAgeRange[2]++;
+                } else {
+                    issuesByAgeRange[3]++;
+                }
+            }
+
+
+
             totalPoints += issue.getPoints();
             if ("DONE".equals(issue.getStatus())) {
                 donePoints += issue.getPoints();
@@ -132,6 +162,8 @@ public class SprintServiceImpl implements SprintService{
         sprintStats.setDonePoints(donePoints);
         sprintStats.setTaskStatusCounts(Arrays.asList(todoCount, inProgressCount, blockedCount, doneCount));
         sprintStats.setMemberStatsMap(memberStatsMap);
+        sprintStats.setIssuesByAgeRange(issuesByAgeRange);
+
 
 
         return sprintStats;

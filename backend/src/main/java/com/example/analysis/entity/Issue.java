@@ -30,6 +30,9 @@ public class Issue {
     @JoinColumn(name = "sprint_id")
     private Sprint sprint;
 
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime startDate;
+
     @Column(name = "description", nullable = false, length = 255)
     private String description;
 

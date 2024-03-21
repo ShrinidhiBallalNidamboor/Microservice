@@ -59,15 +59,21 @@ const SprintPage = () => {
                 const response = await fetch(`http://localhost:8082/sprints/stats/${id}`);
                 const data = await response.json();
                 setBarChartData({
-                    labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
+                    labels: ['0-10', '10-20', '20-30', '>30'],
                     datasets: [
                         {
-                            label: 'Task Status Breakdown',
-                            backgroundColor: ['#FFA07A', '#FFD700', '#FF6347', '#98FB98'],
-                            data: data.taskStatusCounts,
+                            label: 'Age of Pending issues',
+                            backgroundColor: [
+                                '#98FB98', // Green for Low severity
+                                '#FFD700', // Yellow for Medium severity
+                                '#FFA07A', // Light Coral for High severity
+                                '#FF6347'  // Tomato for Critical severity
+                            ],
+                            data: data.issuesByAgeRange,
                         },
                     ],
                 });
+
                 setPieChartData({
                     labels: ['TODO', 'IN_PROGRESS', 'BLOCKED', 'DONE'],
                     datasets: [

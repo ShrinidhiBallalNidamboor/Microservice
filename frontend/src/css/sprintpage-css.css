@@ -1,25 +1,83 @@
 /* SprintPage.css */
 
-.sprint-page-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+/* Add this to your existing sprintpage-css.css file or create a new one */
 
 .sprint-page-container h1 {
-    color: #555;
-    font-size: 54px;
-    margin-bottom: 12px;
     text-align: center;
+    margin: 0;
+    /* Reset default margin */
 }
+
+.sprint-stats-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.feature-menu {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    width: 100%;
+}
+
+.feature-menu-item {
+    cursor: pointer;
+    padding: 10px;
+    margin: 0 10px;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    color: #3498db;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.feature-menu-item:hover {
+    background-color: #3498db;
+    color: #ffffff;
+}
+
+.centered-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.button-stylish.active {
+    /* Add your active button styling here */
+    background-color: #007bff;
+    color: #fff;
+}
+
+.button-stylish {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    background-color: transparent;
+    color: #3498db;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.button-stylish:hover {
+    background-color: #3498db;
+    color: #ffffff;
+}
+
 
 .sprint-details-box {
     border: 1px solid #ddd;
     padding: 15px;
     border-radius: 8px;
-    margin-top: 15px;
+    margin: 15px auto;
+    /* Auto margin to center horizontally */
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    /* Optional: Set a maximum width */
 }
 
 /* sprintpage-css.css */

@@ -21,5 +21,6 @@ public class SprintStats {
     private int donePoints;
     private List<Integer> taskStatusCounts;  // Added for chart data
     private Map<String, MemberStats> memberStatsMap;  // Added for member-wise points
+    private int[] issuesByAgeRange;
 }
 
