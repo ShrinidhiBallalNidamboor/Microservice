@@ -175,27 +175,27 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
-import '../css/QnaTrail.css'
+import '../css/Qna.css'
 
-const Sidebar = () => {
-    // Simulated user data
-    const userData = {
-        username: "JohnDoe",
-        organization: "ABC Inc.",
-        numQuestionsPosted: 10,
-        numQuestionsAnswered: 5
-    };
+// const Sidebar = () => {
+//     // Simulated user data
+//     const userData = {
+//         username: "JohnDoe",
+//         organization: "ABC Inc.",
+//         numQuestionsPosted: 10,
+//         numQuestionsAnswered: 5
+//     };
 
-    return (
-        <div className="sidebar">
-            <h2>User Information</h2>
-            <p><strong>Username:</strong> {userData.username}</p>
-            <p><strong>Organization:</strong> {userData.organization}</p>
-            <p><strong>Questions Posted:</strong> {userData.numQuestionsPosted}</p>
-            <p><strong>Questions Answered:</strong> {userData.numQuestionsAnswered}</p>
-        </div>
-    );
-};
+//     return (
+//         <div className="sidebar">
+//             <h2>User Information</h2>
+//             <p><strong>Username:</strong> {userData.username}</p>
+//             <p><strong>Organization:</strong> {userData.organization}</p>
+//             <p><strong>Questions Posted:</strong> {userData.numQuestionsPosted}</p>
+//             <p><strong>Questions Answered:</strong> {userData.numQuestionsAnswered}</p>
+//         </div>
+//     );
+// };
 
 const Content = () => {
     const [questions, setQuestions] = useState([]);
@@ -329,8 +329,7 @@ const Content = () => {
 
 const QuestionList = () => {
     return (
-        <div className="wrapper">
-            <Sidebar />
+        <div>
             <Content />
         </div>
     );
