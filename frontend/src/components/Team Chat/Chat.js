@@ -62,8 +62,8 @@ const Chat = ({ socket }) => {
     const handleSubmitMessage = () => {
         console.log("Snending message", message);
         socket.emit('chatMessage', {
-            from: token,
-            to: projectId,
+            fromUser: token,
+            toUser: projectId,
             msg: message,
         });
         setMessage("");

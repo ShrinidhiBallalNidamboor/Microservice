@@ -62,8 +62,8 @@ function getUserId(cookie){
     return empID;
     } catch (error) {
         // socket.emit('clear');
-        return null;
-    }
+        return null;
+    }
 }
 
 io.on('connection', (socket) => {
