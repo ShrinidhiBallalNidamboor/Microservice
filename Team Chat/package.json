@@ -11,8 +11,10 @@
   "author": "Neelabh Sinha",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "ejs": "^3.1.9",
     "express": "^4.17.1",
+    "jsonwebtoken": "^9.0.2",
     "moment": "^2.26.0",
     "mongod": "^2.0.0",
     "mongodb": "^3.7.4",

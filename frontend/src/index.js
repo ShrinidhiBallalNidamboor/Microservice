@@ -1,5 +1,5 @@
 // index.js
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import './index.css';
@@ -22,8 +22,14 @@ import SprintPage from './components/Sprint/SprintPage';
 import Qna from './components/Qna/Qna';
 import Trail from './components/Qna/Trail';
 import Answers from './components/Qna/Answers';
+import Chat from './components/Team Chat/Chat';
+
+import io from 'socket.io-client';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+const socket = io.connect('http://localhost:7000');
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
@@ -46,8 +52,9 @@ root.render(
         <Route path='/projects/:projectId/sprints/:sprintId/issues/new' element={<AddIssue/>}></Route>
         <Route path='/projects/:projectId/sprints/:sprintId/analysis' element={<SprintPage/>}></Route>
         <Route path='/Qna' element={<Qna />}></Route>
-      <Route path='/Answers' element={<Answers />}></Route>
-      <Route path='/Trail' element={<Trail />}></Route>
+        <Route path='/projects/:projectId/chat' element={<Chat socket={socket}/>}></Route>
+        <Route path='/Answers' element={<Answers />}></Route>
+        <Route path='/Trail' element={<Trail />}></Route>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

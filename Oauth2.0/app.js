@@ -18,10 +18,11 @@ const PORT = 9000;
 const proxyRoutes = [
   { path: '/Qna', target: 'http://localhost:8000' },
   { path: '/projects', target: 'http://localhost:5000' },
+  { path: '/chat', target: 'http://localhost:7000' },
 ];
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost/oauth2', {
+mongoose.connect('mongodb://0.0.0.0:27017/oauth2', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

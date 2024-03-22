@@ -6,15 +6,18 @@ const formatMessage = require('./utils/chatMessage');
 const mongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require("cors");
+const jwt = require('jsonwebtoken');
 
 const dbname = 'chatApp';
 const port = 7000;
-const database = 'mongodb://localhost:27017/';
+const database = 'mongodb://0.0.0.0:27017/';
 const app = express();
 
 const server=http.createServer(app);
 const io = socketio(server);
 
+app.use(cors());
 // MongoDB connection
 mongoose.connect(database+dbname, {
   useNewUrlParser: true,
@@ -46,12 +49,33 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+function getUserId(cookie){
+    //Authenticate user
+    const token = cookie;
+    console.log("Decoding", token);
+    if (!token) {
+        return null;
+    }
+    try {
+    const decoded = jwt.verify(token, "your-secret-key");
+    const { empID, role, orgID } = decoded;
+    return empID;
+    } catch (error) {
+        // socket.emit('clear');
+        return null;
+    }
+}
+
 io.on('connection', (socket) => {
     console.log('New User Logged In with ID '+socket.id);
 
     //Collect message and insert into database
     socket.on('chatMessage', (data) =>{ //recieves message from client-end along with sender's and reciever's details
         var dataElement = formatMessage(data);
+        dataElement.from = getUserId(dataElement.from)
+        if(dataElement.from == null){
+            console.log("Invalid user");
+        }
         mongoClient.connect(database, async (err,db) => {
             if (err)
                 throw err;
@@ -66,7 +90,8 @@ io.on('connection', (socket) => {
                 });
                 res = await Onlineuser.find({"projectID":data.toUser});
                 for(let j=0;j<res.length;j++){
-                    console.log('Hi')
+                    console.log("Sending to " + res[j]);
+                    console.log(dataElement)
                     socket.to(res[j].ID).emit('message',dataElement);
                 }
             }
@@ -76,16 +101,22 @@ io.on('connection', (socket) => {
     });
 
     socket.on('userDetails',(data) => { //checks if a new user has logged in and recieves the established chat details
+        console.log(data);
         mongoClient.connect(database, (err,db) => {
             if(err)
                 throw err;
             else {
+                data.fromUser = getUserId(data.fromUser)
+                if(data.fromUser == null){
+                    console.log("Invalid user");
+                }
                 var onlineUser = { //forms JSON object for the user details
                     "ID":socket.id,
                     "name":data.fromUser,
                     "projectID":data.toUser
                 };
-                Onlineuser.findOneAndUpdate({"ID":socket.id}, onlineUser, {upsert: true}, function(err, doc) {
+                console.log("Setting online user ", onlineUser);
+                Onlineuser.findOneAndUpdate({"name":data.fromUser}, onlineUser, {upsert: true}, function(err, doc) {
                     if(err){
                         console.log(onlineUser.name + " is already online...");
                     }
@@ -122,6 +153,22 @@ io.on('connection', (socket) => {
     });
 });
 
+app.get('/chat/:projectId', async function (req, res){
+
+    const projectId = req.params.projectId;
+    Chat.find(
+        { "to": { "$in": [projectId] } },
+        { "_id": 0 }, // Projection to exclude _id field
+        (err, data) => {
+            if (err) {
+                throw err;
+            } else {
+                console.log(data);
+                res.json(data);
+            }
+        }
+    );
+})
 
 app.get('/', async function(req, res){
     let projectID=req.query.projectID;
