@@ -110,22 +110,10 @@ footer p {
 }
 
 
-/* Styles for the wrapper containing the sidebar and content */
-.wrapper {
-    display: flex;
-}
+
 
 /* Styles for the sidebar */
-.sidebar {
-    width: 20%; /* Adjust the width as needed */
-    background-color: #6bb2ff; /* Background color */
-    padding: 20px; /* Padding */
-    position: fixed; /* Fix position */
-    top: 0; /* Position from the top */
-    left: 0; /* Position from the left */
-    height: 100%; /* Full height */
-    overflow-y: auto; /* Allow scrolling if content exceeds height */
-}
+
 
 /* Styles for the content */
 .content {
@@ -134,3 +122,4 @@ footer p {
     margin-left: 20%; /* Adjust margin to accommodate fixed sidebar */
     overflow-y: auto; /* Allow scrolling if content exceeds height */
 }
+

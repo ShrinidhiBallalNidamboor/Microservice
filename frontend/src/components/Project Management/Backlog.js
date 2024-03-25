@@ -4,10 +4,11 @@ import Navbar from "../Navbar";
 import ProjectSidebar from "./ProjectSidebar";
 import '../../css/sprint.css';
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../AuthProvider";
 // Sprint dashboard component
 const Backlog = () => {
 
+    const {user} = useAuth();
     const [issues, setIssues] = useState([]);
     const { projectId, sprintId } = useParams();
 
@@ -16,7 +17,11 @@ const Backlog = () => {
 
     useEffect(() => {
         
-        fetch("http://localhost:4000/projects/" + projectId + "/backlog")
+        fetch("http://localhost:9000/projects/" + projectId + "/backlog", {
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            },
+        })
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -30,8 +35,11 @@ const Backlog = () => {
     }
 
     const handleDelete = () => {
-        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
-            method: "DELETE"
+        fetch(`http://localhost:9000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
+            method: "DELETE", 
+            headers : {
+                'Authorization': 'Bearer ' + user.token
+            }
         }).then(res => {
             deleteIssue(selectedIssue);            
             handleCloseModal();
@@ -51,7 +59,7 @@ const Backlog = () => {
     }
 
     const handleEdit = () => {
-        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues`, {
+        fetch(`http://localhost:9000/projects/${projectId}/sprints/${sprintId}/issues`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json',

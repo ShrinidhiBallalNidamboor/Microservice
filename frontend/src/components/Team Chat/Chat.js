@@ -7,6 +7,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'; // Import Link
 import ProjectSidebar from '../Project Management/ProjectSidebar'; 
 import { useCookies } from 'react-cookie';
 import '../../css/chat.scss';
+import { useAuth } from '../AuthProvider';
 
 const Chat = ({ socket }) => {
 
@@ -15,16 +16,15 @@ const Chat = ({ socket }) => {
     const [message, setMessage] = useState("");
     const { projectId } = useParams();
 
-    const [cookies, setCookie] = useCookies(['token']);
-    const token = cookies.token;
+    const {user} = useAuth();
 
-    if (!token) {
-        navigate('/login');
-    }
-    console.log(token);
     console.log(socket.id);
     useEffect(() => {
-        fetch("http://localhost:7000/chat/" + projectId)
+        fetch("http://localhost:7000/chat/" + projectId, {
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        })
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -53,7 +53,7 @@ const Chat = ({ socket }) => {
 
         // setMessages([]);
         // console.log("Logging in");
-        socket.emit('userDetails', { fromUser: token, toUser: projectId }); //emits details of established chat
+        socket.emit('userDetails', { fromUser: user.token, toUser: projectId }); //emits details of established chat
 
         return () => socket.off("message"); // add this line to your code
     }, [socket]);
@@ -62,7 +62,7 @@ const Chat = ({ socket }) => {
     const handleSubmitMessage = () => {
         console.log("Snending message", message);
         socket.emit('chatMessage', {
-            fromUser: token,
+            fromUser: user.token,
             toUser: projectId,
             msg: message,
         });

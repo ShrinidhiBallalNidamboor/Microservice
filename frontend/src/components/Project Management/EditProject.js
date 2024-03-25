@@ -4,10 +4,12 @@ import React from 'react';
 import Navbar from '../Navbar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useAuth } from "../AuthProvider";
 
 const EditProject = () => {
 
     const navigate = useNavigate();
+    const {user} = useAuth();
 
     const {projectId} = useParams();
 
@@ -15,7 +17,11 @@ const EditProject = () => {
     const [name, setName] = useState("");    
 
     useEffect(() => {
-        fetch(`http://localhost:4000/projects/${projectId}`)
+        fetch(`http://localhost:9000/projects/${projectId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            },
+        })
         .then(res => res.json())
         .then(data => {
             console.log(data);
@@ -28,12 +34,13 @@ const EditProject = () => {
     }, [])
 
     const handleSubmit = () => {
-        fetch(`http://localhost:4000/projects/${projectId}`, // TODO
+        fetch(`http://localhost:9000/projects/${projectId}`, // TODO
             {
                 method: "PUT",
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + user.token
                 },
                 body: JSON.stringify(
                     {      

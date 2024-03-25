@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import '../../css/login.scss';
 import { Link, useNavigate } from 'react-router-dom';
 import { CookiesProvider, useCookies } from 'react-cookie'
+import { useAuth } from "../AuthProvider";
 
 const Login = () => {
-  const [cookies, setCookie] = useCookies(['user']);
+
+  const { user, updateUser } = useAuth();
+  const [empID, setEmpID] = useState("");  
+  const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
   const handleSubmit = async () => {
     try {
+      console.log(empID, password);
       const res = await fetch("http://localhost:9000/login",
         {
           method: "POST",
@@ -16,10 +22,11 @@ const Login = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            empID: document.getElementById('empID').value,
-            Password: document.getElementById('loginPassword').value,
+            empID: empID,
+            Password: password,
           })
         });
+      console.log(res);
       if (res.status == 401) {
         alert("Invalid credentials");
       }
@@ -28,8 +35,8 @@ const Login = () => {
       }
       else {
         const data = await res.json();
-        console.log(data.data);
-        setCookie('token', data.data)
+        console.log(data);
+        updateUser(data);
         navigate('/');
       }
     } catch (err) {
@@ -39,15 +46,19 @@ const Login = () => {
   return (
     <div className="authentication">
       <div class="container">
-        <h1><b>Oauth 2.0</b></h1>
+        {/* <h1><b>Oauth 2.0</b></h1> */}
 
         <div class="form active-form" id="loginForm">
           <h2>Login</h2>
           <form>
-            <input type="text" id="empID" placeholder="Employee ID" name="empID" required />
-            <input type="password" id="loginPassword" placeholder="Password" name="Password" required />
+            <input type="text" id="empID" placeholder="Employee ID" name="empID" required onChange={(e) => setEmpID(e.target.value)}/>
+            <input type="password" id="loginPassword" placeholder="Password" name="Password" required onChange={(e) => setPassword(e.target.value)}/>
             <button type="button" onClick={handleSubmit}>Login</button>
           </form>
+          <div className="center mt-4">
+            <span>Do not have an account? </span>
+            <Link to='/register'>Register</Link>
+          </div>
         </div>
       </div>
 

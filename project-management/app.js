@@ -27,6 +27,8 @@ app.use(express.json());
 // Add project in organization
 app.post('/projects', (req, res) => {
     const organization_id = req.query.organization_id;
+    console.log("Add project of organization id ", organization_id)
+
     const { name, description } = req.body;
     if (!organization_id || !name || !description) {
         res.status(400).send('Missing organization_id, name or description');
@@ -93,7 +95,7 @@ app.put('/projects/:id', (req, res) => {
 // Fetch all projects in organization
 app.get('/projects', (req, res) => {
     const organization_id = req.query.organization_id;
-    console.log("Get projects", organization_id)
+    console.log("Get projects of organization id ", organization_id, req.url)
     if (!organization_id) {
         res.status(400).send('Missing organization_id parameter');
         return;
@@ -146,10 +148,18 @@ app.get('/projects/:id/members', (req, res) => {
 })
 
 // add project member
-app.post('/projects/:id/members', (req, res) => {
+app.post('/projects/:id/members', async (req, res) => {
     const projectId = req.params.id;
-
+    const organizationId = req.query.organization_id;
+    // console.log("Project members ", req.empId, req.orgId, req.role);
     const { member } = req.body;
+    console.log(member);
+    // const response = await fetch("http://localhost:9000/organizations/" + organizationId + "/users/" + member.user_id);
+    // if(response.status != 200){
+    //     res.status(400).send("Cannot find user");
+    //     return;
+    // }
+
     connection.query('INSERT into project_members (project_id, name, user_id, role) VALUES (?, ?, ?, ?)', [parseInt(projectId), member.name, member.user_id, member.role], (err, results) => {
         if (err) {
             console.error('Error adding project member', err);
@@ -158,6 +168,29 @@ app.post('/projects/:id/members', (req, res) => {
         }
     });
     res.status(201).send("Project member added successfully");
+})
+
+app.get("/projects/:id/role", (req, res) => {
+    const projectId = req.params.id;
+    const userId = req.query.userId;
+    console.log(projectId, userId);
+    if(!userId){
+        res.status(400).send('Missing user id');
+        return;
+    }
+    connection.query('SELECT * FROM project_members WHERE project_id = ? and user_id = ?', [projectId, userId], (err, results) => {
+        if (err) {
+            console.error('Error fetching role', err);
+            res.status(500).send('Error fetching role');
+            return;
+        }
+        if(results.length == 0){
+            res.status(404).send('User not found in project');
+            return;
+        }
+        console.log(results[0].role);
+        res.json({ role: results[0].role });
+    });
 })
 
 // Fetch sprints of a project
@@ -300,7 +333,7 @@ app.post('/projects/:project_id/sprints/:sprint_id/issues', (req, res) => {
         return;
     }
 
-    connection.query('INSERT INTO issues (sprint_id, description, status, owner_id, owner_name, points) VALUES (?, ?, "TODO", ?, ?, ?)', [sprintId, issue.description, issue.owner_id, issue.owner_name, issue.points], (err, results) => {
+    connection.query('INSERT INTO issues (sprint_id, description, start_date, status, owner_id, owner_name, points) VALUES (?, ?, curdate(), "TODO", ?, ?, ?)', [sprintId, issue.description, issue.owner_id, issue.owner_name, issue.points], (err, results) => {
         if (err) {
             console.error('Error creating issue', err);
             res.status(500).send('Error creating issue');
@@ -356,5 +389,5 @@ app.get("*", (req, res) => {
 })
 
 app.listen(PORT, () => {
-    console.log("Project Mangement Microservice is running");
+    console.log("Project Mangement Microservice is running on port ", PORT);
 });

@@ -7,7 +7,7 @@ import ProjectSidebar from './ProjectSidebar';
 import { useParams } from "react-router-dom";
 import { useAuth } from "../AuthProvider";
 
-const AddProjectMember = () => {
+const AddOrganizationMember = () => {
 
     const { projectId } = useParams();
     const navigate = useNavigate();
@@ -15,12 +15,13 @@ const AddProjectMember = () => {
     const [userId, setUserId] = useState("");
     const [name, setName] = useState("");
     const [role, setRole] = useState("");
+    const [password, setPassword] = useState("");
     const {user} = useAuth();
 
-    const handleRoleChange = (e) => setRole(e);
+    const handleRoleChange = (e) => { setRole(e); console.log(e); };
 
     const handleSubmit = () => {
-        fetch("http://localhost:9000/projects/" + projectId + "/members",
+        fetch(`http://localhost:9000/organizations/${user.orgId}`,
             {
                 method: "POST",
                 headers: {
@@ -29,34 +30,34 @@ const AddProjectMember = () => {
                     'Authorization': 'Bearer ' + user.token
                 },
                 body: JSON.stringify({
-                    member: {
-                        user_id: userId,
+                    user: {
+                        empId: userId,
+                        password: password,
                         name: name,
+                        orgName: user.orgName,
                         role: role
                     }
                 })
             })
             .then(res => {
                 if(res.status != 201){
-                    alert("Error " + res.statusText);
+                    alert("Error adding member");
                 }
-                else
-                    navigate('/projects/' + projectId + '/members');
+                else{
+                    alert("User added successfully");
+                    navigate('/projects');
+                }
             })
     }
     return (
         <div>
             <Navbar active="projects" />
-            <div className="row flex-grow-1">
-                <div className="col-2">
-                    <ProjectSidebar active="sprints" projectId={projectId}></ProjectSidebar>
-
-                </div>
-                <div className="col py-3 px-2">
+            <div className="row flex-grow-1 p-5 justify-content-center">
+                <div className="col-6 py-3 px-2">
 
                     <h2>Add New Member</h2>
                     <div className="form-group my-3">
-                        <label htmlFor="startDate" className='mb-2'>Employee Id</label>
+                        <label htmlFor="userId" className='mb-2'>Employee Id</label>
                         <input
                             type="text"
                             className="form-control"
@@ -65,9 +66,20 @@ const AddProjectMember = () => {
                             onChange={(e) => setUserId(e.target.value)}
                         />
                     </div>
+                    <div className="form-group my-3">
+                        <label htmlFor="password" className='mb-2'>Password</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+
 
                     <div className="form-group my-3">
-                        <label htmlFor="startDate" className='mb-2'>Name</label>
+                        <label htmlFor="name" className='mb-2'>Name</label>
                         <input
                             type="text"
                             className="form-control"
@@ -80,8 +92,8 @@ const AddProjectMember = () => {
                     <div class="form-group mb-3">
                         <label for="role">Role</label><br />
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" checked={role === "LEAD"} name="role" id="lead" value="LEAD" onChange={() => handleRoleChange("LEAD")} />
-                            <label class="form-check-label" for="lead">Lead</label>
+                            <input class="form-check-input" type="radio" checked={role === "OWNER"} name="role" id="owner" value="OWNER" onChange={() => handleRoleChange("OWNER")} />
+                            <label class="form-check-label" for="owner">Owner</label>
                         </div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" checked={role === "MEMBER"} name="role" id="member" value="MEMBER" onChange={() => handleRoleChange("MEMBER")} />
@@ -97,4 +109,4 @@ const AddProjectMember = () => {
     );
 }
 
-export default AddProjectMember;
+export default AddOrganizationMember;

@@ -1,139 +1,221 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from "./Navbar";
-import { Link } from "react-router-dom";
-import '../css/Qna.css'
+import Navbar from '../Navbar';
+import '../../css/Answers.css'
+import { useAuth } from '../AuthProvider';
 
-const QuestionList = () => {
-    const [questions, setQuestions] = useState([]);
+const AddQuestion = () => {
     const [answers, setAnswers] = useState([]);
+    const [question, setquestion] = useState('');
+    const [answerText, setAnswerText] = useState('');
+    const [userName, setUserName] = useState('');
+    const [tag1, settag1] = useState('');
+    const [tag2, settag2] = useState('');
+    const [tag3, settag3] = useState('');
 
-    // Define getUrlParameter function
+    
+    const {user} = useAuth();
+    
+    const userid=user.userId;
+    const orgid=user.orgId;
+
+
+    function sanitizeInput(input) {
+        // Replace single quotes with an empty string or escape them
+        return input.replace(/'/g, ''); // This removes single quotes, modify as needed
+    }
+
+    // useEffect(() => {
+    //     const fetchAnswers = async () => {
+    //         const questionId = getUrlParameter('questionId');
+    //         console.log(questionId)
+    //         if (questionId) {
+    //             try {
+    //                 const response = await fetch(`http://localhost:9000/Qna/api/questions/${questionId}/answers`);
+    //                 const data = await response.json();
+                    
+    //                 setAnswers(data);
+    //             } catch (error) {
+    //                 console.error('Error fetching answers:', error);
+    //             }
+    //         } else {
+    //             console.error('Question ID not provided in URL parameters');
+    //         }
+    //     };
+
+    //     fetchAnswers();
+    // }, []);
+
+    const handleAnswerSubmit = async (event) => {
+        event.preventDefault();
+        const questionId = getUrlParameter('questionId');
+
+        try {
+            const response = await fetch(`http://localhost:9000/Qna/AddQuestion?empid=${userid}&orgid=${orgid}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + user.token
+                },
+                body: JSON.stringify({
+                    answer: sanitizeInput(answerText),
+                    userName: sanitizeInput(userid),
+                    question: sanitizeInput(question),
+                    tag1: sanitizeInput(tag1),
+                    tag2: sanitizeInput(tag2),
+                    tag3: sanitizeInput(tag3)
+                })
+            });
+            const data = await response.json();
+            console.log(data.message);
+
+            window.location.href = '/Trail';
+
+            // Update answers state with the new answer
+            setAnswers(prevAnswers => [
+                ...prevAnswers,
+                {
+                    answer: answerText,
+                    user_name: userName,
+                    upvotes: 0, // Assuming new answer starts with 0 upvotes
+                    downvotes: 0, // Assuming new answer starts with 0 downvotes
+                    created_at: new Date().toISOString() // Current timestamp
+                }
+            ]);
+
+            // Clear input fields
+            setAnswerText('');
+            setquestion('');
+            setUserName('');
+            settag1('');
+            settag2('');
+            settag3('');
+        } catch (error) {
+            console.error('Error submitting answer:', error);
+        }
+    };
+
+    const handleUpvoteAnswer = async (answerId) => {
+        try {
+            const response = await fetch(`http://localhost:9000/Qna/answers/upvote/${answerId}?empid=${userid}&orgid=${orgid}`, { 
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + user.token
+                }
+            });
+            const data = await response.json();
+            console.log(data.message);
+
+            // Update upvotes count in the answers state
+            setAnswers(prevAnswers => prevAnswers.map(answer => {
+                if (answer.id === answerId) {
+                    return { ...answer, upvotes: answer.upvotes + 1 };
+                }
+                return answer;
+            }));
+        } catch (error) {
+            console.error('Error upvoting answer:', error);
+        }
+    };
+
+    const handleDownvoteAnswer = async (answerId) => {
+        try {
+            const response = await fetch(`http://localhost:9000/Qna/answers/downvote/${answerId}?empid=${userid}&orgid=${orgid}`, { 
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + user.token
+                }
+            });
+            const data = await response.json();
+            console.log(data.message);
+
+            // Update downvotes count in the answers state
+            setAnswers(prevAnswers => prevAnswers.map(answer => {
+                if (answer.id === answerId) {
+                    return { ...answer, downvotes: answer.downvotes + 1 };
+                }
+                return answer;
+            }));
+        } catch (error) {
+            console.error('Error downvoting answer:', error);
+        }
+    };
+
+    // Function to get URL parameters
     const getUrlParameter = (name) => {
-        // Implementation of getUrlParameter function
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(window.location.search);
+        const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        const results = regex.exec(window.location.search);
         return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     };
 
-    useEffect(() => {
-        // Fetch questions from the backend when the component mounts
-        fetch('http://localhost:8000/Qna/Userquestions')
-            .then(response => response.json())
-            .then(questionsData => {
-                setQuestions(questionsData);
-            })
-            .catch(error => console.error('Error fetching questions:', error));
-
-        // Fetch answers for the specified question ID
-        const questionId = getUrlParameter('questionId');
-        if (questionId) {
-            fetch(`http://localhost:8000/Qna/api/questions/${questionId}/answers`)
-                .then(response => response.json())
-                .then(answersData => {
-                    setAnswers(answersData);
-                })
-                .catch(error => console.error('Error fetching answers:', error));
-        }
-    }, []);
-
-    // Function to handle upvoting a question
-    const upvoteQuestion = (questionId) => {
-        fetch(`http://localhost:8000/Qna/upvote/${questionId}`, { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // Update the state to reflect the upvote
-                setQuestions(prevQuestions => {
-                    return prevQuestions.map(question => {
-                        if (question.id === questionId) {
-                            return { ...question, upvotes: question.upvotes + 1 };
-                            // return question;
-                        } else {
-                            return question;
-                        }
-                    });
-                });
-            })
-            .catch(error => console.error('Error upvoting question:', error));
-    };
-
-    // Function to handle downvoting a question
-    const downvoteQuestion = (questionId) => {
-        fetch(`http://localhost:8000/Qna/downvote/${questionId}`, { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);
-                // Update the state to reflect the downvote
-                setQuestions(prevQuestions => {
-                    return prevQuestions.map(question => {
-                        if (question.id === questionId) {
-                            return { ...question, downvotes: question.downvotes + 1 };
-                        } else {
-                            return question;
-                        }
-                    });
-                });
-            })
-            .catch(error => console.error('Error downvoting question:', error));
-    };
-
-    // Function to handle redirecting to answers page
-    const addAnswer = (questionId) => {
-        // Redirect to the answers page with the question ID as a URL parameter
-        window.location.href = `answers.html?questionId=${questionId}`;
-    };
-
     return (
-
         <div>
-            <Navbar active="projects"></Navbar>
-            <header>
+            <Navbar active="qna"></Navbar>
+            {/* <header>
                 <h1>QNA</h1>
-            </header>
-            <div className="container" id="questionList">
-                {questions.map(question => (
-                    <div key={question.id} className="question">
-                        <h2>{question.title}</h2>
-                        <p>{question.description}</p>
-                        <div className="actions">
-                            <button onClick={() => upvoteQuestion(question.id)}>
+            </header> */}
+            <div className="container">
+                {/* <h2>Existing Answers</h2> */}
+                <div id="answersSection">
+                    {answers.map(answer => (
+                        <div key={answer.id} className="answer-card">
+                            <div className="card">
+                                <div className="card-body">
+                                    <p className="card-text">Answer:<br /><br /> {answer.answer}</p>
+                                    <p className="card-text">UserID: {answer.userid}</p>
+                                    {/* <button onClick={() => handleUpvoteAnswer(answer.id)}>Upvote</button> */}
+
+                                    <button onClick={() => handleUpvoteAnswer(answer.id)}>
                                 <span><svg xmlns="http://www.w3.org/2000/svg" width="35" height="25" fill="currentColor" className="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
                                     <path d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0"/>
-                                </svg>Upvotes: {question.upvotes}</span>
+                                </svg>Upvotes: {answer.upvotes}</span>
                             </button>
-                            <button onClick={() => downvoteQuestion(question.id)}>
+
+                                    {/* <span>Upvotes: <span id={`upvotes-${answer.id}`}>{answer.upvotes}</span></span> */}
+                                    {/* <button onClick={() => handleDownvoteAnswer(answer.id)}>Downvote</button> */}
+                                    
+                                    <button onClick={() => handleDownvoteAnswer(answer.id)}>
                                 <span><svg xmlns="http://www.w3.org/2000/svg" width="35" height="25" fill="currentColor" className="bi bi-arrow-down-square-fill" viewBox="0 0 16 16">
                                     <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5a.5.5 0 0 1 1 0"/>
-                                </svg>Downvotes: {question.downvotes}</span>
+                                </svg>Downvotes: {answer.downvotes}</span>
                             </button>
-                            {/* <button onClick={() => addAnswer(question.id)}> */}
-                            <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="25" fill="currentColor" className="bi bi-plus-circle" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"/>
-                                </svg><Link to={`/answers?questionId=${question.id}`} style={{ textDecoration: 'none', color: 'white' }}>Add Answer</Link>
-                            </button>
-                            
+                                    
+                                    {/* <span>Downvotes: <span id={`downvotes-${answer.id}`}>{answer.downvotes}</span></span> */}
+                                    <p className="card-text">Posted on: {answer.created_at}</p>
+                                </div>
+                                <br />
+                                <hr />
+                            </div>
                         </div>
+                    ))}
+                </div>
+                <hr />
+                <h2>Add New Questions</h2>
+                <form onSubmit={handleAnswerSubmit}>
+                    <div className="form-group">
+                    <label htmlFor="answer">Your Question:</label>
+                        <textarea id="question" name="answer" rows="2" value={question} onChange={(e) => setquestion(e.target.value)} required></textarea>
+                        <label htmlFor="answer">Description:</label>
+                        <textarea id="answer" name="answer" rows="4" value={answerText} onChange={(e) => setAnswerText(e.target.value)} required></textarea>
                     </div>
-                ))}
-            </div>
-
-            {/* <div className="container" id="answersSection">
-                <h2>Existing Answers</h2>
-                {answers.map(answer => (
-                    <div key={answer.id}>
-                        <p>Answer: {answer.answer}</p>
-                        <p>User: {answer.user_name}</p>
-                        <p>Upvotes: {answer.upvotes}</p>
-                        <p>Downvotes: {answer.downvotes}</p>
-                        <p>Posted on: {answer.created_at}</p>
+                    <div className="form-group">
+                    {/* <label htmlFor="userName">Your Name:</label>
+                    <input type="text" id="userName" name="userName" value={userName} onChange={(e) => setUserName(e.target.value)} required /> */}
+                    <br></br>
+                    <label htmlFor="userName">Tag 1:</label>
+                    <input type="text" id="tag1" name="userName" value={tag1} onChange={(e) => settag1(e.target.value)} required />
+                    <br></br>
+                    <label htmlFor="userName">Tag 2:</label>
+                    <input type="text" id="tag2" name="userName" value={tag2} onChange={(e) => settag2(e.target.value)} required />
+                    <br></br>
+                    <label htmlFor="userName">Tag 3:</label>
+                    <input type="text" id="tag3" name="userName" value={tag3} onChange={(e) => settag3(e.target.value)} required />
                     </div>
-                ))}
-            </div> */}
+                    <button type="submit">Submit Question</button>
+                </form>
+            </div>            
         </div>
-    );
+);
 };
 
-export default QuestionList;
+export default AddQuestion;

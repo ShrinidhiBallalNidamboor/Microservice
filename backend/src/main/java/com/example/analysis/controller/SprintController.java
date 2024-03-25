@@ -53,7 +53,7 @@ public class SprintController {
     }
 
 
-    @GetMapping("/sprints/stats/{id}")
+    @GetMapping("/stats/{id}")
     public SprintStats getSprintStats(@PathVariable Long id) {
         return sprintService.calculateSprintStats(id);
     }

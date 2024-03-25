@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "../Navbar";
 import { Link } from "react-router-dom";
-import '../../css/Qna.css'
+import '../../css/Qna.css';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthProvider';
 
 // const Sidebar = () => {
@@ -27,54 +28,53 @@ import { useAuth } from '../AuthProvider';
 const Content = () => {
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState([]);
+    const [tag, setTag] = useState('');
 
+    const location = useLocation();
+    const [filteredQuestions, setFilteredQuestions] = useState([]);
+    const tag1 = new URLSearchParams(location.search).get('tag');
+    console.log(tag1);
     const { user } = useAuth();
 
     const userid = user.userId;
     const orgid = user.orgId;
 
-    // Define getUrlParameter function
-    const getUrlParameter = (name) => {
-        // Implementation of getUrlParameter function
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(window.location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    };
-
     useEffect(() => {
+        // Function to get URL parameters
+        const getUrlParameter = (name) => {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(window.location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
         // Fetch questions from the backend when the component mounts
         fetch(`http://localhost:9000/Qna/questions?empid=${userid}&orgid=${orgid}`, {
+
             headers: {
                 'Authorization': 'Bearer ' + user.token
             }
         })
             .then(response => response.json())
             .then(questionsData => {
-                setQuestions(questionsData);
-            })
-            .catch(error => console.error('Error fetching questions:', error));
-
-        // Fetch answers for the specified question ID
-        const questionId = getUrlParameter('questionId');
-        if (questionId) {
-            fetch(`http://localhost:9000/Qna/api/questions/${questionId}/answers?empid=${userid}&orgid=${orgid}`, {
-                headers: {
-                    'Authorization': 'Bearer ' + user.token
+                const tagParam = tag1;
+                if (tagParam) {
+                    // Filter questions based on the tag parameter
+                    const filteredQuestions = questionsData.filter(question => question.tag1 === tagParam || question.tag2 === tagParam || question.tag3 === tagParam);
+                    setQuestions(filteredQuestions);
+                    setTag(tagParam);
+                } else {
+                    setQuestions(questionsData);
                 }
             })
-                .then(response => response.json())
-                .then(answersData => {
-                    setAnswers(answersData);
-                })
-                .catch(error => console.error('Error fetching answers:', error));
-        }
+            .catch(error => console.error('Error fetching questions:', error));
     }, []);
 
     // Function to handle upvoting a question
     const upvoteQuestion = (questionId) => {
         fetch(`http://localhost:9000/Qna/upvote/${questionId}?empid=${userid}&orgid=${orgid}`, {
             method: 'POST',
+
             headers: {
                 'Authorization': 'Bearer ' + user.token
             }
@@ -83,17 +83,15 @@ const Content = () => {
             .then(data => {
                 console.log(data.message);
                 // Update the state to reflect the upvote
-                if (data.message !== 'Upvote already recorded for this question') {
-                    setQuestions(prevQuestions => {
-                        return prevQuestions.map(question => {
-                            if (question.id === questionId) {
-                                return { ...question, upvotes: question.upvotes + 1 };
-                            } else {
-                                return question;
-                            }
-                        });
+                setQuestions(prevQuestions => {
+                    return prevQuestions.map(question => {
+                        if (question.id === questionId) {
+                            return { ...question, upvotes: question.upvotes + 1 };
+                        } else {
+                            return question;
+                        }
                     });
-                }
+                });
             })
             .catch(error => console.error('Error upvoting question:', error));
     };
@@ -102,6 +100,7 @@ const Content = () => {
     const downvoteQuestion = (questionId) => {
         fetch(`http://localhost:9000/Qna/downvote/${questionId}?empid=${userid}&orgid=${orgid}`, {
             method: 'POST',
+
             headers: {
                 'Authorization': 'Bearer ' + user.token
             }
@@ -110,17 +109,15 @@ const Content = () => {
             .then(data => {
                 console.log(data.message);
                 // Update the state to reflect the downvote
-                if (data.message !== 'Downvote already recorded for this question') {
-                    setQuestions(prevQuestions => {
-                        return prevQuestions.map(question => {
-                            if (question.id === questionId) {
-                                return { ...question, downvotes: question.downvotes + 1 };
-                            } else {
-                                return question;
-                            }
-                        });
+                setQuestions(prevQuestions => {
+                    return prevQuestions.map(question => {
+                        if (question.id === questionId) {
+                            return { ...question, downvotes: question.downvotes + 1 };
+                        } else {
+                            return question;
+                        }
                     });
-                }
+                });
             })
             .catch(error => console.error('Error downvoting question:', error));
     };
@@ -135,12 +132,10 @@ const Content = () => {
         <div className="content">
             <Navbar active="qna"></Navbar>
             <header>
-                <h1>QNA</h1>
+                <h1>Tag: {tag1}</h1>
             </header>
             <div className="ask-question-button">
                 <Link to="/AddQuestion" className="btn">Ask Question</Link>
-                <span style={{ marginLeft: '10px' }}></span>
-                <Link to="/MyQuestion" className="btn">My Questions</Link>
             </div>
             <br></br>
             <div className="container" id="questionList">
@@ -151,13 +146,13 @@ const Content = () => {
                         <div className="tags">
                             {question.tag1 && (
                                 <button className="tag"><Link to={`/TagQuestion?tag=${question.tag1}`} className="tag" style={{ textDecoration: 'none', color: 'white' }}>#{question.tag1}</Link></button>
-                            )}
+                                )}
                             {question.tag2 && (
                                 <button className="tag"><Link to={`/TagQuestion?tag=${question.tag2}`} className="tag" style={{ textDecoration: 'none', color: 'white' }}>#{question.tag2}</Link></button>
-                            )}
+                                )}
                             {question.tag3 && (
                                 <button className="tag"><Link to={`/TagQuestion?tag=${question.tag3}`} className="tag" style={{ textDecoration: 'none', color: 'white' }}>#{question.tag3}</Link></button>
-                            )}
+                                )}
                         </div>
 
                         <br></br>
@@ -187,14 +182,15 @@ const Content = () => {
     );
 };
 
-const QuestionList = () => {
+const TagQuestionList = () => {
     return (
         <div>
+            {/* <Navbar active="projects"></Navbar> */}
             <Content />
         </div>
     );
 };
 
-export default QuestionList;
+export default TagQuestionList;
 
 

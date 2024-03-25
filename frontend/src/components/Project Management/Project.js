@@ -3,27 +3,66 @@
 
 import React, { useEffect, useState } from 'react';
 import Navbar from '../Navbar';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import ProjectSidebar from './ProjectSidebar';
+import { useAuth } from '../AuthProvider';
 
 const Project = () => {
 
     const { projectId } = useParams();
+    const navigate = useNavigate();
     const [sprints, setSprints] = useState([]);
 
     const [showModal, setShowModal] = useState(false);
     const [startDate, setStartDate] = useState('');
     const [duration, setDuration] = useState('');
+    const [userRole, setUserRole] = useState('');
+    const {user} = useAuth();
 
+    const fetchRole = async () => {
+        fetch(`http://localhost:9000/projects/${projectId}/role?userId=${user.userId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        })
+        .then(res => {
+            if(res.status == 401){
+                navigate('/login')
+            }
+            return res.json();
+        }) 
+        .then(data => {
+            console.log(data);
+            console.log(data);
+            setUserRole(data.role);
+        })
+    }
 
-    useEffect(() => {
-        fetch("http://localhost:4000/projects/" + projectId + "/sprints")
-            .then(res => res.json())
+    const fetchSprints = async () => {
+        fetch("http://localhost:9000/projects/" + projectId + "/sprints",{
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        })
+            .then(res => {
+                if(res.status == 401){
+                    navigate('/login')
+                }
+                return res.json();
+            })
             .then(data => {
                 console.log(data);
                 setSprints(data);
             })
-    }, [sprints]);
+    }
+
+    useEffect(() => {
+        const fetchBoth = async () => {
+            await fetchSprints();
+            await fetchRole();
+        }
+        fetchBoth();
+    }, []);
 
     const handleCreateSprint = () => {
         setShowModal(true);
@@ -31,12 +70,13 @@ const Project = () => {
 
     const handleSubmit = () => {
 
-        fetch("http://localhost:4000/projects/" + projectId + "/sprints",
+        fetch("http://localhost:9000/projects/" + projectId + "/sprints",
             {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + user.token
                 },
                 body: JSON.stringify({
                     "sprint": {
@@ -59,13 +99,16 @@ const Project = () => {
     };
 
     const handleCompleteSprint = (id) => {
-        fetch(`http://localhost:4000/projects/${projectId}/sprints/${id}/complete`,
+        fetch(`http://localhost:9000/projects/${projectId}/sprints/${id}/complete`,
             {
-                method: "PUT"
+                method: "PUT",
+                headers: {
+                    'Authorization': 'Bearer ' + user.token
+                }
             })
             .then(res => {
-                setSprints(sprints);
-            }).catch(err => alert("Error adding sprint ", err));
+                fetchSprints();
+            }).catch(err => alert("Error completing sprint ", err));
     }
 
     return (
@@ -79,9 +122,11 @@ const Project = () => {
                     <div className='sprint-dashboard'>
                         <h2>Sprints</h2>
                         <div>
+                            {userRole === "LEAD" ? 
                             <button className="btn btn-primary mt-2" onClick={handleCreateSprint}>
                                 Create Sprint
                             </button>
+                            : "" }
                             {showModal && (
                                 <div className="modal" tabIndex="-1" role="dialog" style={{ display: 'block' }}>
                                     <div className="modal-dialog" role="document">
@@ -133,7 +178,7 @@ const Project = () => {
                                 {sprints.map((sprint, index) => {
                                     return (
                                         <div className='sprint-details center'>
-                                            <Link to={`/projects/${projectId}/sprints/${sprint.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                            <Link to={sprint.status == "Ongoing" ? `/projects/${projectId}/sprints/${sprint.id}` : "#"} style={{ textDecoration: 'none', color: 'inherit' }}>
                                                 <h4>Sprint {index + 1}</h4>
                                                 <div className='my-2'>Start Date: {sprint.start_date.split("T")[0]}</div>
                                                 {
@@ -144,7 +189,7 @@ const Project = () => {
 
                                             </Link>
                                             {
-                                                sprint.status == "Ongoing" ?
+                                                sprint.status == "Ongoing" && (userRole === "LEAD" || user.role == "OWNER")?
                                                     <button className='mt-2 btn btn-success' onClick={(e) => {e.stopPropagation(); handleCompleteSprint(sprint.id)}}>Complete</button> : ""
                                             }
 

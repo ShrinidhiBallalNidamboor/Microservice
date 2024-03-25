@@ -23,8 +23,15 @@ import Qna from './components/Qna/Qna';
 import Trail from './components/Qna/Trail';
 import Answers from './components/Qna/Answers';
 import Chat from './components/Team Chat/Chat';
+import { AuthProvider } from './components/AuthProvider';
 
 import io from 'socket.io-client';
+import AddOrganizationMember from './components/Project Management/AddOrganizationMember';
+import PrivateRoute from './components/PrivateRoute';
+import TagQuestionList from './components/Qna/Tags';
+import AddQuestion from './components/Qna/UserQNA';
+import Logout from './components/Authentication/Logout';
+import MyQuestions from './components/Qna/MyQuestions';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -33,29 +40,42 @@ const socket = io.connect('http://localhost:7000');
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        {/* <Route path='/sprint-dashboard' element={<SprintDashboard />} /> */}
-        {/* <Route path='/sprint/:sprintId' element={<SprintPage />} /> */}
-        <Route path='/projects' element={<Projects/>}></Route>
-        <Route path='/projects/:projectId' element={<Project/>}></Route>        
-        <Route path='/projects/:projectId/members' element={<ProjectMembers/>}></Route>
-        <Route path='/projects/:projectId/members/new' element={<AddProjectMember/>}></Route>
+      <AuthProvider>
+        <Routes>
 
-        <Route path='/projects/new' element={<AddProject/>}></Route>
-        <Route path='/projects/:projectId/edit' element={<EditProject/>}></Route>
-        <Route path='/projects/:projectId/backlog' element={<Backlog/>}></Route>
-        <Route path='/projects/:projectId/sprints/:sprintId' element={<Sprint/>}></Route>        
-        <Route path='/projects/:projectId/sprints/:sprintId/issues/new' element={<AddIssue/>}></Route>
-        <Route path='/projects/:projectId/sprints/:sprintId/analysis' element={<SprintPage/>}></Route>
-        <Route path='/Qna' element={<Qna />}></Route>
-        <Route path='/projects/:projectId/chat' element={<Chat socket={socket}/>}></Route>
-        <Route path='/Answers' element={<Answers />}></Route>
-        <Route path='/Trail' element={<Trail />}></Route>
-      </Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route element={<PrivateRoute />}>
+            <Route path='/' element={<Projects />} />
+            <Route path='/organization/members/new' element={<AddOrganizationMember />}></Route>
+
+            {/* <Route path='/sprint-dashboard' element={<SprintDashboard />} /> */}
+            {/* <Route path='/sprint/:sprintId' element={<SprintPage />} /> */}
+            <Route path='/projects' element={<Projects />}></Route>
+            <Route path='/projects/:projectId' element={<Project />}></Route>
+            <Route path='/projects/:projectId/members' element={<ProjectMembers />}></Route>
+            <Route path='/projects/:projectId/members/new' element={<AddProjectMember />}></Route>
+
+            <Route path='/projects/new' element={<AddProject />}></Route>
+            <Route path='/projects/:projectId/edit' element={<EditProject />}></Route>
+            <Route path='/projects/:projectId/backlog' element={<Backlog />}></Route>
+            <Route path='/projects/:projectId/sprints/:sprintId' element={<Sprint />}></Route>
+            <Route path='/projects/:projectId/sprints/:sprintId/issues/new' element={<AddIssue />}></Route>
+            <Route path='/projects/:projectId/sprints/:sprintId/analysis' element={<SprintPage />}></Route>
+            <Route path='/Qna' element={<Qna />}></Route>
+            <Route path='/projects/:projectId/chat' element={<Chat socket={socket} />}></Route>
+            <Route path='/Answers' element={<Answers />}></Route>
+            <Route path='/Trail' element={<Trail />}></Route>
+            <Route path='/MyQuestion' element={<MyQuestions />}></Route>
+
+            <Route path='/AddQuestion' element={<AddQuestion />}></Route>
+            <Route path='/TagQuestion' element={<TagQuestionList />}></Route>
+            <Route path='/logout' element={<Logout />}></Route>
+          </Route>
+
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
+
   </React.StrictMode>
 );

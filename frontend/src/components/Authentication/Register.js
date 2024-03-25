@@ -16,12 +16,14 @@ const Register = () => {
                     empID: document.getElementById('empID').value,
                     organisationName: document.getElementById('organisationName').value,
                     Password: document.getElementById('registerPassword').value,
+                    name: document.getElementById('name').value,
                 })
             })
             .then(res => {
-                alert(res)
-                if (res.status == 201)
+                if (res.status == 201){
+                    alert("Registered successfully");
                     navigate('/login');
+                }
                 else {
                     alert('Registration Failed');
                 }
@@ -35,15 +37,20 @@ const Register = () => {
         <div className="authentication">
 
             <div class="container">
-                <h1><b>Oauth 2.0</b></h1>
+                {/* <h1><b>Oauth 2.0</b></h1> */}
                 <div class="form active-form" id="registerForm">
                     <h2>Register</h2>
                     <form>
                         <input type="text" id="empID" placeholder="Employee ID" name="empID" required />
                         <input type="text" id="organisationName" placeholder="Name of Organisation" name="organisationName" required />
+                        <input type="text" id="name" placeholder="User name" name="name" required />
                         <input type="password" id="registerPassword" placeholder="Password" name="Password" required />
                         <button type="button" onClick={handleSubmit}>Register</button>
                     </form>
+                    <div className="center mt-4">
+                        <span>Already have an account? </span>
+                        <Link to='/login'>Login</Link>
+                    </div>
                 </div>
             </div>
 

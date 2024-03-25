@@ -44,7 +44,7 @@ const Content = () => {
 
     useEffect(() => {
         // Fetch questions from the backend when the component mounts
-        fetch(`http://localhost:9000/Qna/questions?empid=${userid}&orgid=${orgid}`, {
+        fetch(`http://localhost:9000/Qna/myquestions?empid=${userid}&orgid=${orgid}`, {
             headers: {
                 'Authorization': 'Bearer ' + user.token
             }
@@ -135,7 +135,7 @@ const Content = () => {
         <div className="content">
             <Navbar active="qna"></Navbar>
             <header>
-                <h1>QNA</h1>
+                <h1>My Questions</h1>
             </header>
             <div className="ask-question-button">
                 <Link to="/AddQuestion" className="btn">Ask Question</Link>
@@ -187,7 +187,7 @@ const Content = () => {
     );
 };
 
-const QuestionList = () => {
+const MyQuestions = () => {
     return (
         <div>
             <Content />
@@ -195,6 +195,6 @@ const QuestionList = () => {
     );
 };
 
-export default QuestionList;
+export default MyQuestions;
 
 

@@ -2,17 +2,32 @@
 
 import React, { useEffect, useState } from 'react';
 import Navbar from '../Navbar';
-import { Link, useParams } from 'react-router-dom'; // Import Link
+import { Link, useNavigate, useParams } from 'react-router-dom'; // Import Link
 import axios from 'axios';
+import { useAuth } from '../AuthProvider';
 
 const Projects = () => {
 
+    const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
+    const { user } = useAuth();
 
     useEffect(() => {
-        fetch("http://localhost:4000/projects?organization_id=1")
-            .then((res) => res.json())
-            .then((data) => { setProjects(data) });
+        console.log(user.role);
+        fetch(`http://localhost:9000/projects?organization_id=${user.orgId}`, {
+
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        })
+            .then((res) => {
+                if (res.status == 401) {
+                    alert("Session expired, please login");
+                    navigate('/login');
+                }
+                return res.json();
+            })
+            .then((data) => { console.log(data); setProjects(data) });
     }, []);
 
     return (
@@ -24,7 +39,13 @@ const Projects = () => {
                         <h1 className="mb-4">Projects</h1>
                     </div>
                     <div className="col-6 d-flex justify-content-end">
-                        <Link to="/projects/new"><button className='btn btn-primary'>Add Project</button></Link>
+                    {user.role.toUpperCase() === "OWNER" ?
+                            <div>
+                                <Link to="/projects/new"><button className='btn btn-primary'>Add Project</button></Link>
+                                <Link to="/organization/members/new"><button className='btn btn-primary mx-3'>Add Organization Member</button></Link>
+
+                            </div>: 
+                    ""}
                     </div>
                 </div>
                 <table className="table table-bordered table-striped">
@@ -46,9 +67,11 @@ const Projects = () => {
                                     <Link to={"/projects/" + project.id}>
                                         <button className="btn btn-secondary btn-small mt-1 mb-1 mx-1">View</button>
                                     </Link>
-                                    <Link to={"/projects/" + project.id + "/edit"}>
-                                        <button className="btn btn-secondary btn-small mt-1 mb-1">Edit</button>
-                                    </Link>
+                                    {user.role.toUpperCase() === "OWNER" ?
+                                        <Link to={"/projects/" + project.id + "/edit"}>
+                                            <button className="btn btn-secondary btn-small mt-1 mb-1">Edit</button>
+                                        </Link> : ""
+                                    }
                                 </td>
                             </tr>);
                         })}

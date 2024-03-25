@@ -5,6 +5,7 @@ import Navbar from '../Navbar';
 import { Link, useNavigate } from 'react-router-dom'; // Import Link
 import ProjectSidebar from './ProjectSidebar';
 import { useParams } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 const AddIssue = () => {
 
@@ -13,21 +14,23 @@ const AddIssue = () => {
 
     const [description, setDescription] = useState("");
     const [points, setPoints] = useState("");
+    const {user} = useAuth();
 
     const handleSubmit = () => {
-        fetch("http://localhost:4000/projects/" + projectId + "/sprints/" + sprintId + "/issues",
+        fetch("http://localhost:9000/projects/" + projectId + "/sprints/" + sprintId + "/issues",
         {
             method: "POST",
             headers:{          
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + user.token
               },
             body: JSON.stringify({
                 issue : {
                     description : description,
                     points: points,
-                    owner_name: "ABC",
-                    owner_id: "ABC"
+                    owner_name: user.name,
+                    owner_id: user.userId,
                 }
             })
         })

@@ -4,10 +4,12 @@ import Navbar from "../Navbar";
 import ProjectSidebar from "./ProjectSidebar";
 import '../../css/sprint.css';
 import { Link } from "react-router-dom";
+import { useAuth } from "../AuthProvider";
 
 // Sprint dashboard component
 const Sprint = () => {
 
+    const {user} = useAuth();
     const [issues, setIssues] = useState([]);
     const { projectId, sprintId } = useParams();
 
@@ -16,7 +18,11 @@ const Sprint = () => {
 
     useEffect(() => {
 
-        fetch("http://localhost:4000/projects/" + projectId + "/sprints/" + sprintId + "/issues")
+        fetch("http://localhost:9000/projects/" + projectId + "/sprints/" + sprintId + "/issues", {
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
+        })
             .then(res => res.json())
             .then(data => {
                 console.log(data);
@@ -30,8 +36,11 @@ const Sprint = () => {
     }
 
     const handleDelete = () => {
-        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
-            method: "DELETE"
+        fetch(`http://localhost:9000/projects/${projectId}/sprints/${sprintId}/issues/${selectedIssue.id}`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': 'Bearer ' + user.token
+            }
         }).then(res => {
             deleteIssue(selectedIssue);
             handleCloseModal();
@@ -51,11 +60,12 @@ const Sprint = () => {
     }
 
     const handleEdit = () => {
-        fetch(`http://localhost:4000/projects/${projectId}/sprints/${sprintId}/issues`, {
+        fetch(`http://localhost:9000/projects/${projectId}/sprints/${sprintId}/issues`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + user.token
             },
             body: JSON.stringify({
                 issue: {

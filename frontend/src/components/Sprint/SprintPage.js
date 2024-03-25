@@ -5,11 +5,14 @@ import { CategoryScale } from 'chart.js';
 import Navbar from '../Navbar';
 import './../../css/sprintpage-css.css';
 import Sprintstats from './SprintStats';
+import { useAuth } from '../AuthProvider';
+import ProjectSidebar from '../Project Management/ProjectSidebar';
 
 Chart.register(CategoryScale);
 
 const SprintPage = () => {
     const { projectId, sprintId } = useParams();
+    const {user} = useAuth();
     // const [showStats, setShowStats] = useState(false);
     // const [issues, setIssues] = useState([]);
     // const [sprintDetails, setSprintDetails] = useState({});
@@ -56,7 +59,11 @@ const SprintPage = () => {
     useEffect(() => {
         const fetchSprintStats = async () => {
             try {
-                const response = await fetch(`http://localhost:8082/sprints/stats/${sprintId}`);
+                const response = await fetch(`http://localhost:9000/stats/${sprintId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + user.token
+                    }
+                });
                 const data = await response.json();
                 console.log(data);
                 setBarChartData({
@@ -135,7 +142,13 @@ const SprintPage = () => {
                     {showLabel1}
                 </button> */}
             {/* </div> */}
-            
+            <div className='row'>
+                <div className='col-2'>
+                    <ProjectSidebar active="sprints"></ProjectSidebar>
+
+                </div>
+
+            </div>
             <Sprintstats pieChartData={pieChartData} barChartData={barChartData} statsData={statsData} />
            
         </div>
