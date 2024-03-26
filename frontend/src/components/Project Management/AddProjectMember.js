@@ -14,8 +14,9 @@ const AddProjectMember = () => {
 
     const [userId, setUserId] = useState("");
     const [name, setName] = useState("");
+
     const [role, setRole] = useState("");
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     const handleRoleChange = (e) => setRole(e);
 
@@ -32,12 +33,13 @@ const AddProjectMember = () => {
                     member: {
                         user_id: userId,
                         name: name,
+
                         role: role
                     }
                 })
             })
             .then(res => {
-                if(res.status != 201){
+                if (res.status != 201) {
                     alert("Error " + res.statusText);
                 }
                 else
@@ -76,6 +78,8 @@ const AddProjectMember = () => {
                             onChange={(e) => setName(e.target.value)}
                         />
                     </div>
+
+
 
                     <div class="form-group mb-3">
                         <label for="role">Role</label><br />

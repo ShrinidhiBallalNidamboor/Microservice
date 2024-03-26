@@ -17,6 +17,8 @@ const proxyRoutes = [
   { path: '/stats', target: 'http://localhost:8082' },
   { path: '/login', target: 'http://localhost:2000' },
   { path: '/register', target: 'http://localhost:2000' },
+  { path: '/verify2fa', target: 'http://localhost:2000' },
+  { path: '/organizations', target: 'http://localhost:2000' },
 ];
 
 // app.use(express.json());
@@ -24,7 +26,7 @@ const proxyRoutes = [
 app.use(async (req, res, next) => {
   console.log("Inside middleware");
   console.log(req.url);
-  if(req.url!="/login" && req.url!="/register"){
+  if (req.url != "/login" && req.url != "/register" && req.url != "/verify2fa") {
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
     console.log(token);
     if (!token) {
@@ -39,12 +41,12 @@ app.use(async (req, res, next) => {
       //     token: token
       //   })
       // });
-      var response = await fetch(`http://localhost:2000/verify?token=${token}`)
+      var response = await axios.get(`http://localhost:2000/verify?token=${token}`)
       console.log(response.status);
-      if(response.status == 401){
+      if (response.status == 401) {
         console.log("Invalid token");
-         res.status(401).send("Invalid token");
-         return;
+        res.status(401).send("Invalid token");
+        return;
       }
       // console.log("Decoded", response);
       // const { empID, role, orgID } = decoded;
@@ -55,10 +57,11 @@ app.use(async (req, res, next) => {
       console.log("Token is valid");
       console.log(req.url);
     } catch (error) {
-      console.log("error" , error);
+      console.log("error", error);
       return res.status(401).json({ error: 'Invalid token' });
     }
   }
+  console.log("hello")
   next();
 });
 

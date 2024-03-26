@@ -17,10 +17,11 @@ const Register = () => {
                     organisationName: document.getElementById('organisationName').value,
                     Password: document.getElementById('registerPassword').value,
                     name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
                 })
             })
             .then(res => {
-                if (res.status == 201){
+                if (res.status == 201) {
                     alert("Registered successfully");
                     navigate('/login');
                 }
@@ -44,6 +45,7 @@ const Register = () => {
                         <input type="text" id="empID" placeholder="Employee ID" name="empID" required />
                         <input type="text" id="organisationName" placeholder="Name of Organisation" name="organisationName" required />
                         <input type="text" id="name" placeholder="User name" name="name" required />
+                        <input type="text" id="email" placeholder="Email" name="email" required />
                         <input type="password" id="registerPassword" placeholder="Password" name="Password" required />
                         <button type="button" onClick={handleSubmit}>Register</button>
                     </form>

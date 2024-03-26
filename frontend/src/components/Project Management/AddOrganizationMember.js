@@ -15,8 +15,9 @@ const AddOrganizationMember = () => {
     const [userId, setUserId] = useState("");
     const [name, setName] = useState("");
     const [role, setRole] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     const handleRoleChange = (e) => { setRole(e); console.log(e); };
 
@@ -35,15 +36,16 @@ const AddOrganizationMember = () => {
                         password: password,
                         name: name,
                         orgName: user.orgName,
+                        email: email,
                         role: role
                     }
                 })
             })
             .then(res => {
-                if(res.status != 201){
+                if (res.status != 201) {
                     alert("Error adding member");
                 }
-                else{
+                else {
                     alert("User added successfully");
                     navigate('/projects');
                 }
@@ -86,6 +88,17 @@ const AddOrganizationMember = () => {
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="form-group my-3">
+                        <label htmlFor="startDate" className='mb-2'>Email</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 

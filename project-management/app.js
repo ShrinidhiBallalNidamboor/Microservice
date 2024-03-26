@@ -10,7 +10,7 @@ app.use(cors());
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'admin',
+    password: 'password123?',
     database: 'project_management'
 });
 
@@ -174,7 +174,7 @@ app.get("/projects/:id/role", (req, res) => {
     const projectId = req.params.id;
     const userId = req.query.userId;
     console.log(projectId, userId);
-    if(!userId){
+    if (!userId) {
         res.status(400).send('Missing user id');
         return;
     }
@@ -184,7 +184,7 @@ app.get("/projects/:id/role", (req, res) => {
             res.status(500).send('Error fetching role');
             return;
         }
-        if(results.length == 0){
+        if (results.length == 0) {
             res.status(404).send('User not found in project');
             return;
         }
