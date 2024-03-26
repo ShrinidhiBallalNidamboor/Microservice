@@ -222,7 +222,7 @@ const Backlog = () => {
                     )}
                     {issues.length == 0 ?
                         <h5 className="center mt-5">
-                            No issues have been added to this sprint
+                            No issues are in the backlog
                         </h5>
                         : ""}
                 </div>

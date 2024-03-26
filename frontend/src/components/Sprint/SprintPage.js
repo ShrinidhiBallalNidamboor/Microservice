@@ -144,7 +144,7 @@ const SprintPage = () => {
             {/* </div> */}
             <div className='row'>
                 <div className='col-2'>
-                    <ProjectSidebar active="sprints"></ProjectSidebar>
+                    <ProjectSidebar active="sprints" projectId={projectId}></ProjectSidebar>
 
                 </div>
 

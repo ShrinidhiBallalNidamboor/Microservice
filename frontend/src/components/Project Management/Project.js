@@ -122,7 +122,7 @@ const Project = () => {
                     <div className='sprint-dashboard'>
                         <h2>Sprints</h2>
                         <div>
-                            {userRole === "LEAD" ? 
+                            {userRole === "LEAD" || user.role == "OWNER" ? 
                             <button className="btn btn-primary mt-2" onClick={handleCreateSprint}>
                                 Create Sprint
                             </button>

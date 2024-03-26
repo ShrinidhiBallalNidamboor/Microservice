@@ -58,7 +58,16 @@ app.post('/register', express.json(), async (req, res) => {
   // Create a new user
   await Organisation.findOneAndUpdate({ name: orgName }, { name: orgName }, { upsert: true });
   const organisation = await Organisation.findOne({ name: orgName });
-  await User.findOneAndUpdate({}, { empID: empID, orgID: organisation._id, orgName: orgName, name: name, password: password, role: role }, { upsert: true });
+  // console.log(req.body);
+  const newUser = new User({ empID: empID, name: name, orgID: organisation._id, orgName: orgName, password: password, role: role });
+  console.log(newUser);
+  newUser.save(function(err, user) {
+    if (err) {
+      res.status(400).send("Cannot add user");
+      return;
+    }
+  });
+  // await User.insertOne({ empID: empID, orgID: organisation._id, orgName: orgName, name: name, password: password, role: role });
   console.log('User registered successfully');
   res.status(201).send('User registered successfully');
 });

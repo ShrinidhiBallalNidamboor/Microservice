@@ -21,6 +21,7 @@ const Projects = () => {
             }
         })
             .then((res) => {
+                console.log(res.status);
                 if (res.status == 401) {
                     alert("Session expired, please login");
                     navigate('/login');

@@ -33,6 +33,17 @@ const Content = () => {
     const userid = user.userId;
     const orgid = user.orgId;
 
+    const [searchValue, setSearchValue] = useState('');
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            redirectToTagQuestion();
+        }
+    };
+
+    const redirectToTagQuestion = () => {
+        window.location.href = `/TagQuestion?tag=${searchValue}`;
+    };
     // Define getUrlParameter function
     const getUrlParameter = (name) => {
         // Implementation of getUrlParameter function
@@ -137,11 +148,24 @@ const Content = () => {
             <header>
                 <h1>QNA</h1>
             </header>
-            <div className="ask-question-button">
-                <Link to="/AddQuestion" className="btn">Ask Question</Link>
+            <div className="ask-question-button" style={{ display: 'flex', alignItems: 'center' }}>
+            <div>
+                <a href="/AddQuestion" className="btn">Ask Question</a>
                 <span style={{ marginLeft: '10px' }}></span>
-                <Link to="/MyQuestion" className="btn">My Questions</Link>
+                <a href="/MyQuestion" className="btn">My Questions</a>
             </div>
+            <div style={{ marginLeft: 'auto' }}>
+                <input 
+                    type="text" 
+                    placeholder="Search by tag..." 
+                    value={searchValue} 
+                    onChange={(e) => setSearchValue(e.target.value)} 
+                    onKeyPress={handleKeyPress} 
+                    style={{ marginLeft: 'auto' }} 
+                />
+                {/* You can add additional styling or functionality to the search bar as needed */}
+            </div>
+        </div>
             <br></br>
             <div className="container" id="questionList">
                 {questions.map(question => (

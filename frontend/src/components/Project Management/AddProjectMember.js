@@ -49,7 +49,7 @@ const AddProjectMember = () => {
             <Navbar active="projects" />
             <div className="row flex-grow-1">
                 <div className="col-2">
-                    <ProjectSidebar active="sprints" projectId={projectId}></ProjectSidebar>
+                    <ProjectSidebar active="team" projectId={projectId}></ProjectSidebar>
 
                 </div>
                 <div className="col py-3 px-2">
